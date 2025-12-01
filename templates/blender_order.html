@@ -1,292 +1,185 @@
 {% extends "base.html" %}
 
-{% block title %}Blender Order - Python's GPUs{% endblock %}
+{% block title %}Order Blender Render - Python's GPUs{% endblock %}
 
-{% block content %}
-<div class="container order-container">
-    <a href="/" class="btn btn-secondary mb-3">
-        <i class="fas fa-arrow-left"></i> Back to Home
-    </a>
-    
-    <div class="order-card">
-        <div class="order-header">
-            <h1 class="mb-2">Blender Rendering Order</h1>
-            <div class="service-tags mb-3">
-                <span class="tag dev-tag">Under Development</span>
-                <span class="tag work-tag">Active Development</span>
-            </div>
-            <p class="order-subtitle">
-                Submit your Blender project for GPU rendering. Current price: <strong>{{ prices.blender_per_frame }} per frame</strong>
-            </p>
-        </div>
-        
-        <div class="order-content">
-            <div class="order-form-container">
-                <form method="POST" class="order-form" onsubmit="return handleFormSubmit()">
-                    <!-- Email -->
-                    <div class="form-group">
-                        <label for="email" class="form-label">
-                            <i class="fas fa-envelope"></i> Your Email *
-                        </label>
-                        <input type="email" id="email" name="email" class="form-control" 
-                               required placeholder="you@example.com">
-                        <small class="form-text">We'll contact you at this address</small>
-                    </div>
-                    
-                    <!-- Project Link -->
-                    <div class="form-group">
-                        <label for="project_link" class="form-label">
-                            <i class="fas fa-link"></i> Project Link *
-                        </label>
-                        <input type="url" id="project_link" name="project_link" class="form-control"
-                               required placeholder="https://drive.google.com/... or https://github.com/...">
-                        <small class="form-text">Share your .blend file via cloud storage</small>
-                    </div>
-                    
-                    <!-- Frame Count -->
-                    <div class="form-group">
-                        <label for="frame_count" class="form-label">
-                            <i class="fas fa-film"></i> Estimated Frame Count
-                        </label>
-                        <input type="number" id="frame_count" name="frame_count" class="form-control"
-                               min="1" value="100" onchange="updatePriceEstimate()">
-                        <small class="form-text">Approximate number of frames to render</small>
-                    </div>
-                    
-                    <!-- Toggle: Bargain -->
-                    <div class="form-group">
-                        <div class="form-toggle">
-                            <label class="toggle-switch toggle-small">
-                                <input type="checkbox" id="bargain" name="bargain" 
-                                       onchange="updatePriceEstimate()">
-                                <span class="toggle-slider"></span>
-                            </label>
-                            <label for="bargain" class="toggle-label">
-                                <i class="fas fa-handshake"></i> I want to bargain the price
-                            </label>
-                        </div>
-                        <small class="form-text">Check this if you'd like to negotiate a custom price</small>
-                    </div>
-                    
-                    <!-- Toggle: Priority -->
-                    <div class="form-group">
-                        <div class="form-toggle">
-                            <label class="toggle-switch toggle-small">
-                                <input type="checkbox" id="priority" name="priority" 
-                                       onchange="updatePriceEstimate()">
-                                <span class="toggle-slider"></span>
-                            </label>
-                            <label for="priority" class="toggle-label">
-                                <i class="fas fa-bolt"></i> High Priority ({{ prices.priority_multiplier }} price)
-                            </label>
-                        </div>
-                        <small class="form-text">Your job will be moved to the front of the queue</small>
-                    </div>
-                    
-                    <!-- Notes -->
-                    <div class="form-group">
-                        <label for="notes" class="form-label">
-                            <i class="fas fa-sticky-note"></i> Additional Notes
-                        </label>
-                        <textarea id="notes" name="notes" class="form-control" rows="4"
-                                  placeholder="Blender version, render settings, special requirements..."></textarea>
-                    </div>
-                    
-                    <!-- Price Estimate -->
-                    <div class="price-summary">
-                        <h3 class="mb-2">Price Estimate</h3>
-                        <div class="price-row">
-                            <span>Base price ({{ prices.blender_per_frame }}/frame):</span>
-                            <span id="base-price-display">{{ prices.blender_per_frame }}</span>
-                        </div>
-                        <div class="price-row">
-                            <span>Priority multiplier:</span>
-                            <span id="multiplier-display">1x</span>
-                        </div>
-                        <div class="price-row price-total">
-                            <span>Estimated total:</span>
-                            <span id="total-estimate">$4.00</span>
-                        </div>
-                        <small class="form-text">This is an estimate. Final price may vary.</small>
-                    </div>
-                    
-                    <!-- Development Notice -->
-                    <div class="development-notice mb-3">
-                        <i class="fas fa-tools"></i>
-                        <div>
-                            <strong>Important Notice:</strong>
-                            <p>This service is currently under development. By submitting, you're expressing interest 
-                               and helping us prioritize development. We'll contact you when the service is ready.</p>
-                        </div>
-                    </div>
-                    
-                    <!-- Submit Button -->
-                    <button type="submit" class="btn btn-primary btn-full" id="submit-btn">
-                        <i class="fas fa-paper-plane"></i> Submit Order Request
-                    </button>
-                </form>
-            </div>
-            
-            <div class="order-info">
-                <h3 class="mb-2"><i class="fas fa-info-circle"></i> How It Works</h3>
-                <ol class="info-steps mb-3">
-                    <li><strong>Submit this form</strong> with your project details</li>
-                    <li><strong>We review</strong> your project within 24 hours</li>
-                    <li><strong>Confirm details</strong> and provide payment info</li>
-                    <li><strong>We render</strong> your frames on our GPU servers</li>
-                    <li><strong>You receive</strong> rendered frames via download link</li>
-                </ol>
-                
-                <div class="requirements mb-3">
-                    <h4 class="mb-1"><i class="fas fa-check-circle"></i> Requirements</h4>
-                    <ul class="service-features">
-                        <li>Blender 3.0 or higher</li>
-                        <li>Project must include all assets</li>
-                        <li>Render settings pre-configured</li>
-                        <li>Large files may require special handling</li>
-                    </ul>
-                </div>
-                
-                <div class="contact-support">
-                    <h4 class="mb-1"><i class="fas fa-question-circle"></i> Questions?</h4>
-                    <p>Email us at <strong>support@pythons-gpus.com</strong></p>
-                    <p><small>Typical response time: 24 hours</small></p>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
-
-<script>
-// Price calculation
-function updatePriceEstimate() {
-    const basePrice = {{ prices.blender_per_frame|replace('$', '')|float }};
-    const frameCount = parseInt(document.getElementById('frame_count').value) || 100;
-    const priority = document.getElementById('priority').checked;
-    const multiplier = priority ? 1.5 : 1.0;
-    
-    const total = basePrice * frameCount * multiplier;
-    
-    // Update displays
-    document.getElementById('base-price-display').textContent = `$${(basePrice * frameCount).toFixed(2)}`;
-    document.getElementById('multiplier-display').textContent = multiplier + 'x';
-    document.getElementById('total-estimate').textContent = '$' + total.toFixed(2);
-}
-
-// Form submission handler
-function handleFormSubmit() {
-    const btn = document.getElementById('submit-btn');
-    const originalText = btn.innerHTML;
-    
-    // Show loading state
-    btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Processing...';
-    btn.disabled = true;
-    
-    // Allow form to submit normally
-    return true;
-}
-
-// Initialize price estimate
-document.addEventListener('DOMContentLoaded', function() {
-    updatePriceEstimate();
-});
-</script>
-
+{% block head %}
 <style>
-/* Additional styles for order page */
-.order-content {
+/* Professional Order Page Styles */
+.order-page {
+    min-height: calc(100vh - 200px);
+    padding: 3rem 0;
+    background: var(--bg-secondary);
+}
+
+.order-header-section {
+    text-align: center;
+    margin-bottom: 3rem;
+    padding-bottom: 2rem;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.order-header-section h1 {
+    font-size: 2.5rem;
+    font-weight: 700;
+    margin-bottom: 1rem;
+    color: var(--text-primary);
+}
+
+.order-subtitle {
+    color: var(--text-secondary);
+    font-size: 1.1rem;
+    max-width: 700px;
+    margin: 0 auto;
+    line-height: 1.6;
+}
+
+.order-grid {
     display: grid;
-    grid-template-columns: 2fr 1fr;
-    gap: 2rem;
-    margin-top: 2rem;
+    grid-template-columns: 1fr 400px;
+    gap: 3rem;
+    max-width: 1200px;
+    margin: 0 auto;
 }
 
 @media (max-width: 992px) {
-    .order-content {
+    .order-grid {
         grid-template-columns: 1fr;
     }
 }
 
-.order-form-container {
+/* Order Form Card */
+.order-form-card {
     background: var(--card-bg);
-    padding: 2rem;
-    border-radius: 8px;
+    border-radius: 12px;
+    padding: 2.5rem;
     border: 1px solid var(--border-color);
+    box-shadow: 0 4px 20px var(--shadow-color);
 }
 
-.order-info {
-    background: var(--card-bg);
-    padding: 2rem;
-    border-radius: 8px;
-    border: 1px solid var(--border-color);
-    height: fit-content;
+.form-section {
+    margin-bottom: 2.5rem;
+    padding-bottom: 2rem;
+    border-bottom: 1px solid var(--border-color);
 }
 
-.info-steps {
-    list-style: none;
-    counter-reset: step-counter;
-    padding-left: 0;
+.form-section:last-child {
+    border-bottom: none;
+    margin-bottom: 0;
+    padding-bottom: 0;
 }
 
-.info-steps li {
-    counter-increment: step-counter;
-    margin-bottom: 1rem;
-    padding-left: 2rem;
-    position: relative;
-}
-
-.info-steps li:before {
-    content: counter(step-counter);
-    position: absolute;
-    left: 0;
-    top: 0;
-    background: var(--accent-primary);
-    color: white;
-    width: 20px;
-    height: 20px;
-    border-radius: 50%;
+.section-title {
+    font-size: 1.25rem;
+    font-weight: 600;
+    margin-bottom: 1.5rem;
+    color: var(--text-primary);
     display: flex;
     align-items: center;
-    justify-content: center;
-    font-size: 0.75rem;
-    font-weight: bold;
+    gap: 0.75rem;
 }
 
-.development-notice {
-    background: var(--warning);
-    color: #212529;
-    padding: 1rem;
-    border-radius: 6px;
-    display: flex;
-    gap: 1rem;
-    align-items: flex-start;
-    border: 1px solid rgba(0,0,0,0.1);
+.section-title i {
+    color: var(--accent-primary);
 }
 
-.development-notice i {
-    font-size: 1.2rem;
-    margin-top: 0.2rem;
+.form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.5rem;
+    margin-bottom: 1.5rem;
 }
 
-.form-text {
+@media (max-width: 768px) {
+    .form-row {
+        grid-template-columns: 1fr;
+    }
+}
+
+.form-group {
+    margin-bottom: 1.5rem;
+}
+
+.form-label {
     display: block;
-    margin-top: 0.25rem;
-    color: var(--text-secondary);
-    font-size: 0.875rem;
+    margin-bottom: 0.5rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    font-size: 0.95rem;
+}
+
+.form-label .required {
+    color: var(--danger);
+    margin-left: 2px;
+}
+
+.form-control {
+    width: 100%;
+    padding: 0.875rem 1rem;
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    background: var(--bg-primary);
+    color: var(--text-primary);
+    font-size: 0.95rem;
+    transition: all 0.2s ease;
+    font-family: 'Inter', sans-serif;
+}
+
+.form-control:focus {
+    outline: none;
+    border-color: var(--accent-primary);
+    box-shadow: 0 0 0 3px rgba(13, 110, 253, 0.1);
+}
+
+.form-control::placeholder {
+    color: var(--text-muted);
+}
+
+textarea.form-control {
+    min-height: 120px;
+    resize: vertical;
+    line-height: 1.5;
+}
+
+/* Professional Toggle Switch */
+.toggle-container {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 1rem;
+    background: var(--bg-tertiary);
+    border-radius: 8px;
+    border: 1px solid var(--border-color);
+    margin-bottom: 1rem;
+    transition: all 0.2s ease;
+}
+
+.toggle-container:hover {
+    border-color: var(--accent-primary);
+}
+
+.toggle-content {
+    flex: 1;
 }
 
 .toggle-label {
-    font-weight: 500;
+    font-weight: 600;
     color: var(--text-primary);
-    cursor: pointer;
+    display: block;
+    margin-bottom: 0.25rem;
 }
 
-/* Fix toggle switch sizing */
+.toggle-description {
+    font-size: 0.875rem;
+    color: var(--text-secondary);
+    line-height: 1.4;
+}
+
 .toggle-switch {
     position: relative;
-    width: 50px;
-    height: 26px;
+    width: 52px;
+    height: 28px;
     flex-shrink: 0;
+    margin-left: 1rem;
 }
 
 .toggle-switch input {
@@ -304,20 +197,21 @@ document.addEventListener('DOMContentLoaded', function() {
     bottom: 0;
     background: var(--toggle-bg);
     border-radius: 34px;
-    border: 2px solid var(--toggle-border);
+    border: 2px solid var(--border-color);
     transition: .4s;
 }
 
 .toggle-slider:before {
     position: absolute;
     content: "";
-    height: 18px;
-    width: 18px;
+    height: 20px;
+    width: 20px;
     left: 2px;
     bottom: 2px;
     background: var(--toggle-handle);
     border-radius: 50%;
     transition: .4s;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
 }
 
 .toggle-switch input:checked + .toggle-slider {
@@ -329,16 +223,602 @@ document.addEventListener('DOMContentLoaded', function() {
     transform: translateX(24px);
 }
 
-.toggle-small {
-    width: 50px;
-    height: 26px;
+/* Price Summary */
+.price-summary-card {
+    background: var(--card-bg);
+    border-radius: 12px;
+    padding: 2rem;
+    border: 1px solid var(--border-color);
+    box-shadow: 0 4px 20px var(--shadow-color);
+    position: sticky;
+    top: 2rem;
 }
 
-.toggle-small .toggle-slider:before {
-    height: 18px;
-    width: 18px;
-    left: 2px;
-    bottom: 2px;
+.price-header {
+    text-align: center;
+    margin-bottom: 2rem;
+    padding-bottom: 1.5rem;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.price-header h3 {
+    font-size: 1.5rem;
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+    color: var(--text-primary);
+}
+
+.price-details {
+    margin-bottom: 2rem;
+}
+
+.price-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.75rem 0;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.price-label {
+    color: var(--text-secondary);
+    font-size: 0.95rem;
+}
+
+.price-value {
+    font-weight: 600;
+    color: var(--text-primary);
+    font-family: 'SF Mono', monospace;
+}
+
+.price-total {
+    margin-top: 1.5rem;
+    padding-top: 1.5rem;
+    border-top: 2px solid var(--accent-primary);
+}
+
+.total-label {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: var(--text-primary);
+}
+
+.total-value {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--accent-primary);
+    font-family: 'SF Mono', monospace;
+}
+
+.price-note {
+    text-align: center;
+    font-size: 0.875rem;
+    color: var(--text-secondary);
+    margin-top: 1rem;
+    line-height: 1.4;
+}
+
+/* Order Summary */
+.order-summary {
+    background: var(--bg-tertiary);
+    padding: 1.5rem;
+    border-radius: 8px;
+    margin-top: 2rem;
+    border: 1px solid var(--border-color);
+}
+
+.summary-title {
+    font-size: 1.1rem;
+    font-weight: 600;
+    margin-bottom: 1rem;
+    color: var(--text-primary);
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.summary-list {
+    list-style: none;
+    padding-left: 0;
+}
+
+.summary-list li {
+    padding: 0.5rem 0;
+    color: var(--text-secondary);
+    display: flex;
+    align-items: flex-start;
+    gap: 0.75rem;
+    font-size: 0.95rem;
+}
+
+.summary-list li i {
+    color: var(--accent-primary);
+    margin-top: 0.2rem;
+    flex-shrink: 0;
+}
+
+/* Submit Button */
+.submit-section {
+    text-align: center;
+    margin-top: 3rem;
+}
+
+.submit-btn {
+    padding: 1rem 3rem;
+    font-size: 1.1rem;
+    font-weight: 600;
+    border-radius: 8px;
+    background: var(--accent-primary);
+    color: white;
+    border: none;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.75rem;
+    min-width: 250px;
+    justify-content: center;
+}
+
+.submit-btn:hover {
+    background: var(--accent-secondary);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(13, 110, 253, 0.2);
+}
+
+.submit-btn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    transform: none !important;
+}
+
+/* Alert Box */
+.alert-box {
+    background: #fff3cd;
+    border: 1px solid #ffc107;
+    border-radius: 8px;
+    padding: 1.25rem;
+    margin: 2rem 0;
+    display: flex;
+    gap: 1rem;
+    align-items: flex-start;
+}
+
+.alert-box i {
+    color: #d97706;
+    font-size: 1.25rem;
+    margin-top: 0.1rem;
+    flex-shrink: 0;
+}
+
+.alert-content h4 {
+    color: #92400e;
+    margin-bottom: 0.5rem;
+    font-size: 1rem;
+}
+
+.alert-content p {
+    color: #92400e;
+    margin: 0;
+    line-height: 1.5;
+    font-size: 0.95rem;
+}
+
+/* Form Validation */
+.form-control.error {
+    border-color: var(--danger);
+}
+
+.error-message {
+    color: var(--danger);
+    font-size: 0.875rem;
+    margin-top: 0.25rem;
+    display: none;
+}
+
+.form-control.error + .error-message {
+    display: block;
 }
 </style>
+{% endblock %}
+
+{% block content %}
+<div class="order-page">
+    <div class="container">
+        <!-- Header -->
+        <div class="order-header-section">
+            <h1>Blender Rendering Order</h1>
+            <p class="order-subtitle">
+                Submit your 3D project for professional GPU rendering. Get high-quality results with our optimized 
+                rendering infrastructure. All services are currently in development phase.
+            </p>
+            <div class="service-tags" style="justify-content: center; margin-top: 1.5rem;">
+                <span class="tag dev-tag">Under Development</span>
+                <span class="tag work-tag">Active Development</span>
+            </div>
+        </div>
+
+        <div class="order-grid">
+            <!-- Left Column: Order Form -->
+            <div class="order-form-card">
+                <!-- Project Details Section -->
+                <div class="form-section">
+                    <h3 class="section-title">
+                        <i class="fas fa-cube"></i>
+                        Project Details
+                    </h3>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="email" class="form-label">
+                                Email Address <span class="required">*</span>
+                            </label>
+                            <input type="email" id="email" name="email" class="form-control" 
+                                   required placeholder="name@company.com">
+                            <div class="error-message">Please enter a valid email address</div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="frame_count" class="form-label">
+                                Frame Count <span class="required">*</span>
+                            </label>
+                            <input type="number" id="frame_count" name="frame_count" class="form-control"
+                                   min="1" max="10000" value="100" required onchange="updatePriceSummary()">
+                            <div class="error-message">Please enter a valid number of frames</div>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="project_link" class="form-label">
+                            Project File Link <span class="required">*</span>
+                        </label>
+                        <input type="url" id="project_link" name="project_link" class="form-control"
+                               required placeholder="https://drive.google.com/... or https://dropbox.com/...">
+                        <small class="form-text" style="display: block; margin-top: 0.5rem; color: var(--text-secondary);">
+                            Share a download link to your .blend file (Google Drive, Dropbox, OneDrive, etc.)
+                        </small>
+                        <div class="error-message">Please enter a valid URL</div>
+                    </div>
+                </div>
+
+                <!-- Rendering Options Section -->
+                <div class="form-section">
+                    <h3 class="section-title">
+                        <i class="fas fa-sliders-h"></i>
+                        Rendering Options
+                    </h3>
+                    
+                    <!-- Priority Toggle -->
+                    <div class="toggle-container">
+                        <div class="toggle-content">
+                            <span class="toggle-label">Priority Rendering</span>
+                            <span class="toggle-description">
+                                Move your project to the front of the queue. 1.5x base price multiplier.
+                            </span>
+                        </div>
+                        <label class="toggle-switch">
+                            <input type="checkbox" id="priority" name="priority" onchange="updatePriceSummary()">
+                            <span class="toggle-slider"></span>
+                        </label>
+                    </div>
+                    
+                    <!-- Bargain Toggle -->
+                    <div class="toggle-container">
+                        <div class="toggle-content">
+                            <span class="toggle-label">Custom Pricing Request</span>
+                            <span class="toggle-description">
+                                Request a custom quote for large projects or special requirements.
+                            </span>
+                        </div>
+                        <label class="toggle-switch">
+                            <input type="checkbox" id="bargain" name="bargain" onchange="updatePriceSummary()">
+                            <span class="toggle-slider"></span>
+                        </label>
+                    </div>
+                </div>
+
+                <!-- Additional Information Section -->
+                <div class="form-section">
+                    <h3 class="section-title">
+                        <i class="fas fa-info-circle"></i>
+                        Additional Information
+                    </h3>
+                    
+                    <div class="form-group">
+                        <label for="notes" class="form-label">
+                            Project Notes & Requirements
+                        </label>
+                        <textarea id="notes" name="notes" class="form-control" rows="4"
+                                  placeholder="Please include:&#10;• Blender version&#10;• Required render settings&#10;• Output format requirements&#10;• Any special instructions"></textarea>
+                        <small class="form-text" style="display: block; margin-top: 0.5rem; color: var(--text-secondary);">
+                            Detailed information helps us provide better service and accurate pricing.
+                        </small>
+                    </div>
+                </div>
+
+                <!-- Development Notice -->
+                <div class="alert-box">
+                    <i class="fas fa-tools"></i>
+                    <div class="alert-content">
+                        <h4>Service Development Notice</h4>
+                        <p>
+                            This service is currently under active development. By submitting this form, 
+                            you are expressing interest in our service and helping us prioritize development. 
+                            We will contact you when the service becomes available to discuss your specific 
+                            requirements and provide a final quote.
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Submit Section -->
+                <div class="submit-section">
+                    <form method="POST" onsubmit="return handleOrderSubmission(event)">
+                        <button type="submit" class="submit-btn" id="submit-btn">
+                            <i class="fas fa-paper-plane"></i>
+                            Submit Order Request
+                        </button>
+                        <p class="price-note" style="margin-top: 1rem;">
+                            No payment required at this stage. This is a preliminary inquiry.
+                        </p>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Right Column: Price Summary -->
+            <div class="price-summary-card">
+                <div class="price-header">
+                    <h3>Price Estimate</h3>
+                    <p style="color: var(--text-secondary); font-size: 0.95rem;">
+                        Based on current selections
+                    </p>
+                </div>
+                
+                <div class="price-details">
+                    <div class="price-row">
+                        <span class="price-label">Base Price (per frame)</span>
+                        <span class="price-value">{{ prices.blender_per_frame }}</span>
+                    </div>
+                    
+                    <div class="price-row">
+                        <span class="price-label">Frame Count</span>
+                        <span class="price-value" id="frame-count-display">100</span>
+                    </div>
+                    
+                    <div class="price-row">
+                        <span class="price-label">Priority Multiplier</span>
+                        <span class="price-value" id="multiplier-display">1x</span>
+                    </div>
+                    
+                    <div class="price-row">
+                        <span class="price-label">Subtotal</span>
+                        <span class="price-value" id="subtotal-display">$4.00</span>
+                    </div>
+                    
+                    <div class="price-row price-total">
+                        <span class="total-label">Estimated Total</span>
+                        <span class="total-value" id="total-estimate">$4.00</span>
+                    </div>
+                </div>
+                
+                <p class="price-note">
+                    * Prices are estimates. Final quote may vary based on project complexity 
+                    and specific requirements. Taxes not included.
+                </p>
+                
+                <!-- Order Summary -->
+                <div class="order-summary">
+                    <h4 class="summary-title">
+                        <i class="fas fa-clipboard-check"></i>
+                        What's Included
+                    </h4>
+                    <ul class="summary-list">
+                        <li>
+                            <i class="fas fa-check-circle"></i>
+                            <span>GPU-accelerated rendering with Blender Cycles</span>
+                        </li>
+                        <li>
+                            <i class="fas fa-check-circle"></i>
+                            <span>Support for complex scenes and animations</span>
+                        </li>
+                        <li>
+                            <i class="fas fa-check-circle"></i>
+                            <span>Secure file handling and storage</span>
+                        </li>
+                        <li>
+                            <i class="fas fa-check-circle"></i>
+                            <span>Technical support during rendering</span>
+                        </li>
+                        <li>
+                            <i class="fas fa-check-circle"></i>
+                            <span>Download link for rendered frames</span>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+// Initialize price summary
+document.addEventListener('DOMContentLoaded', function() {
+    updatePriceSummary();
+    setupFormValidation();
+});
+
+// Price calculation
+function updatePriceSummary() {
+    const basePrice = {{ prices.blender_per_frame|replace('$', '')|float }};
+    const frameCount = parseInt(document.getElementById('frame_count').value) || 100;
+    const priority = document.getElementById('priority').checked;
+    const multiplier = priority ? 1.5 : 1.0;
+    
+    // Calculate prices
+    const baseTotal = basePrice * frameCount;
+    const total = baseTotal * multiplier;
+    
+    // Update displays
+    document.getElementById('frame-count-display').textContent = frameCount;
+    document.getElementById('multiplier-display').textContent = multiplier + 'x';
+    document.getElementById('subtotal-display').textContent = '$' + baseTotal.toFixed(2);
+    document.getElementById('total-estimate').textContent = '$' + total.toFixed(2);
+    
+    // Update toggle labels
+    const bargainToggle = document.getElementById('bargain').checked;
+    const bargainLabel = document.querySelector('.toggle-container:last-child .toggle-label');
+    if (bargainToggle) {
+        bargainLabel.textContent = 'Custom Pricing (Requested)';
+    } else {
+        bargainLabel.textContent = 'Custom Pricing Request';
+    }
+}
+
+// Form validation
+function setupFormValidation() {
+    const formControls = document.querySelectorAll('.form-control[required]');
+    
+    formControls.forEach(control => {
+        control.addEventListener('blur', function() {
+            validateField(this);
+        });
+        
+        control.addEventListener('input', function() {
+            if (this.classList.contains('error')) {
+                validateField(this);
+            }
+        });
+    });
+}
+
+function validateField(field) {
+    const errorMessage = field.nextElementSibling;
+    
+    if (field.type === 'email') {
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!emailRegex.test(field.value)) {
+            field.classList.add('error');
+            return false;
+        }
+    } else if (field.type === 'url') {
+        try {
+            new URL(field.value);
+        } catch {
+            field.classList.add('error');
+            return false;
+        }
+    } else if (field.type === 'number') {
+        if (!field.value || parseInt(field.value) < 1 || parseInt(field.value) > 10000) {
+            field.classList.add('error');
+            return false;
+        }
+    }
+    
+    field.classList.remove('error');
+    return true;
+}
+
+// Form submission
+function handleOrderSubmission(event) {
+    event.preventDefault();
+    
+    // Validate all fields
+    const requiredFields = document.querySelectorAll('.form-control[required]');
+    let isValid = true;
+    
+    requiredFields.forEach(field => {
+        if (!validateField(field)) {
+            isValid = false;
+        }
+    });
+    
+    if (!isValid) {
+        alert('Please fix the errors in the form before submitting.');
+        return false;
+    }
+    
+    // Show loading state
+    const submitBtn = document.getElementById('submit-btn');
+    const originalText = submitBtn.innerHTML;
+    submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Processing Request...';
+    submitBtn.disabled = true;
+    
+    // Create form data
+    const formData = new FormData();
+    formData.append('email', document.getElementById('email').value);
+    formData.append('project_link', document.getElementById('project_link').value);
+    formData.append('frame_count', document.getElementById('frame_count').value);
+    formData.append('priority', document.getElementById('priority').checked);
+    formData.append('bargain', document.getElementById('bargain').checked);
+    formData.append('notes', document.getElementById('notes').value);
+    
+    // Submit form
+    fetch('/blender-order', {
+        method: 'POST',
+        body: formData
+    })
+    .then(response => {
+        if (response.redirected) {
+            window.location.href = response.url;
+        } else {
+            throw new Error('Submission failed');
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        submitBtn.innerHTML = originalText;
+        submitBtn.disabled = false;
+        alert('There was an error submitting your order. Please try again.');
+    });
+    
+    return false;
+}
+
+// Auto-save form data (optional)
+function autoSaveForm() {
+    const formData = {
+        email: document.getElementById('email').value,
+        frame_count: document.getElementById('frame_count').value,
+        project_link: document.getElementById('project_link').value,
+        priority: document.getElementById('priority').checked,
+        bargain: document.getElementById('bargain').checked,
+        notes: document.getElementById('notes').value
+    };
+    localStorage.setItem('blenderOrderDraft', JSON.stringify(formData));
+}
+
+// Load saved draft
+function loadDraft() {
+    const saved = localStorage.getItem('blenderOrderDraft');
+    if (saved) {
+        try {
+            const data = JSON.parse(saved);
+            document.getElementById('email').value = data.email || '';
+            document.getElementById('frame_count').value = data.frame_count || '100';
+            document.getElementById('project_link').value = data.project_link || '';
+            document.getElementById('priority').checked = data.priority || false;
+            document.getElementById('bargain').checked = data.bargain || false;
+            document.getElementById('notes').value = data.notes || '';
+            updatePriceSummary();
+        } catch (e) {
+            console.log('No saved draft found');
+        }
+    }
+}
+
+// Auto-save on changes
+document.addEventListener('DOMContentLoaded', function() {
+    loadDraft();
+    
+    const formInputs = document.querySelectorAll('.form-control, input[type="checkbox"]');
+    formInputs.forEach(input => {
+        input.addEventListener('input', autoSaveForm);
+        input.addEventListener('change', autoSaveForm);
+    });
+    
+    // Clear draft on successful submission
+    window.addEventListener('beforeunload', function() {
+        localStorage.removeItem('blenderOrderDraft');
+    });
+});
+</script>
 {% endblock %}
