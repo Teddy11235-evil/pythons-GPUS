@@ -1,0 +1,93 @@
+{% extends "base.html" %}
+
+{% block content %}
+    <section class="hero">
+        <div class="container">
+            <div class="gpu-animation">
+                <i class="fas fa-microchip"></i>
+            </div>
+            <div class="status-badge">
+                <span class="pulse-dot"></span>
+                <span id="status-message">Loading...</span>
+            </div>
+            <h1>Python's GPU Compute Is Coming Up!</h1>
+            <p class="subtitle">
+                Rent high-performance GPU resources for your Python tasks. Scalable, reliable, and cost-effective computing solutions.
+            </p>
+            <a href="#services" class="cta-button">Get Started Now</a>
+        </div>
+    </section>
+
+    <section class="stats">
+        <div class="container">
+            <div class="stat-card">
+                <div class="stat-number">99.9%</div>
+                <p>Uptime SLA</p>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number">24/7</div>
+                <p>Support Available</p>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number">500+</div>
+                <p>Tasks Completed</p>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number">50ms</div>
+                <p>Average Response Time</p>
+            </div>
+        </div>
+    </section>
+
+    <section class="services" id="services">
+        <div class="container">
+            <h2 class="section-title">Our Compute Services</h2>
+            <div class="services-grid">
+                <div class="service-card">
+                    <div class="service-icon">
+                        <i class="fas fa-code"></i>
+                    </div>
+                    <h3>Python GPU Tasks</h3>
+                    <p class="price">$0.10 / min</p>
+                    <ul class="features">
+                        <li>NVIDIA GPU Acceleration</li>
+                        <li>Python 3.9+ Environment</li>
+                        <li>8GB GPU Memory</li>
+                        <li>Real-time Monitoring</li>
+                    </ul>
+                    <button class="cta-button">Start Computing</button>
+                </div>
+
+                <div class="service-card">
+                    <div class="service-icon">
+                        <i class="fas fa-brain"></i>
+                    </div>
+                    <h3>ML Model Training</h3>
+                    <p class="price">$0.25 / min</p>
+                    <ul class="features">
+                        <li>Multi-GPU Support</li>
+                        <li>TensorFlow/PyTorch Ready</li>
+                        <li>Data Pipeline Integration</li>
+                        <li>Checkpoint Storage</li>
+                    </ul>
+                    <button class="cta-button">Train Models</button>
+                </div>
+
+                <div class="service-card">
+                    <div class="service-icon">
+                        <i class="fas fa-database"></i>
+                    </div>
+                    <h3>Data Processing</h3>
+                    <p class="price">$0.15 / min</p>
+                    <ul class="features">
+                        <li>Parallel Processing</li>
+                        <li>Large Dataset Support</li>
+                        <li>Spark Integration</li>
+                        <li>Result Export</li>
+                    </ul>
+                    <button class="cta-button">Process Data</button>
+                </div>
+            </div>
+        </div>
+    </section>
+{% endblock %}
