@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+
+{% block content %}
+    <div class="container">
+        <a href="/" class="back-button">
+            <i class="fas fa-arrow-left"></i> Back to Home
+        </a>
+        
+        <div class="about-content">
+            <h1>About Our Compute Service</h1>
+            <div class="markdown-content">
+                {{ content|safe }}
+            </div>
+        </div>
+    </div>
+{% endblock %}
