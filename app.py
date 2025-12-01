@@ -5,29 +5,60 @@ import os
 import random
 import time
 import json
+from functools import lru_cache
+import threading
 
 app = Flask(__name__)
 
-# Discord Webhook URL (your provided URL)
+# ===== CONFIGURATION =====
 DISCORD_WEBHOOK_URL = "https://discord.com/api/webhooks/1445098227815944192/9RuBPnQoe6wYDmtqnDHpf7PB401_lS9BfNKkCeYT4DhQyRCc4HUaRep8tiPqE594rLpI"
-
-# GitHub URLs
 ABOUT_FILE_URL = "https://raw.githubusercontent.com/Teddy11235-evil/pythons-GPUS/main/about.txt"
 PRICES_FILE_URL = "https://raw.githubusercontent.com/Teddy11235-evil/pythons-GPUS/main/prices.txt"
 
-# Cache
-cache = {'prices': {}, 'about': '', 'last_fetch': 0}
-CACHE_TIMEOUT = 300
-
-# ===== DISCORD WEBHOOK FUNCTIONS =====
-def send_discord_order_notification(order_data):
-    """Send formatted order information to Discord"""
-    if not DISCORD_WEBHOOK_URL:
-        print("[Discord] Webhook URL not configured")
-        return False
+# Cache Manager
+class CacheManager:
+    def __init__(self, ttl=300):
+        self.ttl = ttl
+        self.cache = {}
+        self.lock = threading.Lock()
     
-    # Create formatted message in code block
-    formatted_message = f"""```yaml
+    def get(self, key):
+        with self.lock:
+            if key in self.cache:
+                data, timestamp = self.cache[key]
+                if time.time() - timestamp < self.ttl:
+                    return data
+            return None
+    
+    def set(self, key, value):
+        with self.lock:
+            self.cache[key] = (value, time.time())
+    
+    def clear(self, key=None):
+        with self.lock:
+            if key:
+                self.cache.pop(key, None)
+            else:
+                self.cache.clear()
+
+cache = CacheManager(ttl=300)
+
+# ===== DISCORD FUNCTIONS (same as before) =====
+def send_discord_async(content, username="Python's GPUS Bot"):
+    def send():
+        try:
+            payload = {"content": content, "username": username}
+            requests.post(DISCORD_WEBHOOK_URL, json=payload, timeout=5)
+        except:
+            pass
+    
+    thread = threading.Thread(target=send)
+    thread.daemon = True
+    thread.start()
+    return thread
+
+def format_order_message(order_data):
+    return f"""```yaml
 📦 NEW ORDER RECEIVED
 ════════════════════════════════════════
 📧 Contact Email: {order_data.get('email', 'Not provided')}
@@ -35,7 +66,7 @@ def send_discord_order_notification(order_data):
 
 🛒 Order Details:
 ────────────────────────────────────────
-• Service Type: {order_data.get('service_type', 'Not specified')}
+• Service Type: {order_data.get('service_type', 'Blender Rendering')}
 • Project Link: {order_data.get('project_link', 'Not provided')}
 • Estimated Frames: {order_data.get('frame_count', 'Not specified')}
 • Bargain Requested: {'✅ Yes' if order_data.get('bargain') else '❌ No'}
@@ -51,107 +82,34 @@ def send_discord_order_notification(order_data):
 🌐 Website Info:
 ────────────────────────────────────────
 • IP Address: {order_data.get('user_ip', 'Not recorded')}
-• User Agent: {order_data.get('user_agent', 'Not recorded')}
-• Referrer: {order_data.get('referrer', 'Direct visit')}
+• User Agent: {order_data.get('user_agent', 'Unknown')[:50]}...
 
 ⚠️ Status: UNDER DEVELOPMENT
 ════════════════════════════════════════
 This is a pre-order request. Service is in development.
 ```"""
-    
-    # Create embed with code block
-    embed = {
-        "title": "🎉 New Blender Render Order!",
-        "description": "A new order has been submitted to the website.",
-        "color": 0x00ff00,  # Green
-        "timestamp": datetime.utcnow().isoformat(),
-        "footer": {
-            "text": "Python's GPUS Order System",
-            "icon_url": "https://cdn-icons-png.flaticon.com/512/5968/5968350.png"
-        },
-        "fields": [
-            {
-                "name": "Quick Info",
-                "value": f"**Email:** {order_data.get('email', 'N/A')}\n**Service:** {order_data.get('service_type', 'N/A')}\n**Frames:** {order_data.get('frame_count', 'N/A')}",
-                "inline": True
-            },
-            {
-                "name": "Options",
-                "value": f"**Bargain:** {'Yes' if order_data.get('bargain') else 'No'}\n**Priority:** {'Yes' if order_data.get('priority') else 'No'}\n**Status:** Under Development",
-                "inline": True
-            }
-        ]
-    }
-    
-    # Create payload with both code block and embed
-    payload = {
-        "content": formatted_message,
-        "username": "Python's GPUS Order Bot",
-        "avatar_url": "https://cdn-icons-png.flaticon.com/512/3094/3094067.png",
-        "embeds": [embed]
-    }
-    
-    try:
-        response = requests.post(DISCORD_WEBHOOK_URL, json=payload, timeout=10)
-        if response.status_code in [200, 204]:
-            print(f"[Discord] Order notification sent successfully")
-            return True
-        else:
-            print(f"[Discord] Failed to send: {response.status_code} - {response.text}")
-            return False
-    except Exception as e:
-        print(f"[Discord] Error sending notification: {e}")
-        return False
 
-def send_discord_test():
-    """Send a test message to Discord"""
-    test_message = """```yaml
-✅ WEBHOOK TEST SUCCESSFUL
-════════════════════════════════════════
-• Service: Python's GPUS Server
-• Status: ✅ Operational
-• Time: {time}
-• Test: Discord Webhook Integration
-════════════════════════════════════════
-This confirms your Discord webhook is working correctly!
-```""".format(time=datetime.now().strftime('%Y-%m-%d %H:%M:%S'))
-    
-    payload = {
-        "content": test_message,
-        "username": "Python's GPUS Test Bot",
-        "avatar_url": "https://cdn-icons-png.flaticon.com/512/190/190411.png"
-    }
-    
-    try:
-        response = requests.post(DISCORD_WEBHOOK_URL, json=payload, timeout=5)
-        return response.status_code in [200, 204]
-    except:
-        return False
+def notify_new_order(order_data):
+    message = format_order_message(order_data)
+    send_discord_async(message, "🎉 New Order")
+    return True
 
-# ===== HELPER FUNCTIONS =====
-def fetch_from_github(url):
-    """Fetch content from GitHub"""
+# ===== GITHUB FETCHING =====
+@lru_cache(maxsize=2)
+def fetch_github_content(url):
     try:
-        response = requests.get(url, timeout=5)
+        response = requests.get(url, timeout=3)
         response.raise_for_status()
         return response.text
-    except Exception as e:
-        print(f"Error fetching from GitHub {url}: {e}")
+    except:
         return None
 
-def get_cached_content(key, url):
-    """Get content from cache or fetch from GitHub"""
-    current_time = time.time()
-    if key not in cache or current_time - cache['last_fetch'] > CACHE_TIMEOUT:
-        content = fetch_from_github(url)
-        if content:
-            cache[key] = content
-            cache['last_fetch'] = current_time
-    return cache.get(key, '')
-
-def parse_prices():
-    """Parse prices from prices.txt"""
-    prices_content = get_cached_content('prices', PRICES_FILE_URL)
+def get_prices():
+    cached = cache.get('prices')
+    if cached:
+        return cached
+    
+    content = fetch_github_content(PRICES_FILE_URL)
     prices = {
         'blender_per_frame': '$0.04',
         'hash_per_minute': '$0.05',
@@ -160,42 +118,57 @@ def parse_prices():
         'status': 'development'
     }
     
-    if prices_content:
-        for line in prices_content.strip().split('\n'):
+    if content:
+        for line in content.strip().split('\n'):
             if ':' in line:
                 key, value = line.split(':', 1)
                 prices[key.strip().lower()] = value.strip()
     
+    cache.set('prices', prices)
     return prices
 
-def get_client_info():
-    """Get client information from request"""
-    return {
-        'ip': request.headers.get('X-Forwarded-For', request.remote_addr),
-        'user_agent': request.headers.get('User-Agent', 'Unknown'),
-        'referrer': request.headers.get('Referer', 'Direct')
-    }
+def get_about_content():
+    cached = cache.get('about')
+    if cached:
+        return cached
+    
+    content = fetch_github_content(ABOUT_FILE_URL)
+    if not content:
+        content = "# About Our Compute Service\n\nContent loading..."
+    
+    cache.set('about', content)
+    return content
 
 # ===== ROUTES =====
 @app.route('/')
 def home():
-    prices = parse_prices()
-    user_count = random.randint(1, 15)
-    return render_template('index.html', prices=prices, user_count=user_count)
+    prices = get_prices()
+    return render_template('index.html', 
+                         prices=prices, 
+                         user_count=random.randint(1, 15))
+
+@app.route('/toggle-dark-mode', methods=['POST'])
+def toggle_dark_mode():
+    """Toggle dark mode preference"""
+    data = request.get_json()
+    dark_mode = data.get('dark_mode', False)
+    # In production, you'd save this to a database or session
+    # For now, we'll just acknowledge it
+    return jsonify({'success': True, 'dark_mode': dark_mode})
 
 @app.route('/about')
 def about():
-    about_content = get_cached_content('about', ABOUT_FILE_URL)
-    if not about_content:
-        about_content = "# About Our Compute Service\n\nContent loading..."
-    return render_template('about.html', content=about_content)
+    content = get_about_content()
+    return render_template('about.html', content=content)
 
 @app.route('/blender-order', methods=['GET', 'POST'])
 def blender_order():
-    prices = parse_prices()
+    if request.method == 'GET':
+        prices = get_prices()
+        return render_template('blender_order.html', prices=prices)
     
-    if request.method == 'POST':
-        # Collect form data
+    # POST request
+    try:
         email = request.form.get('email', '').strip()
         project_link = request.form.get('project_link', '').strip()
         bargain = request.form.get('bargain') == 'on'
@@ -203,15 +176,11 @@ def blender_order():
         notes = request.form.get('notes', '').strip()
         frame_count = request.form.get('frame_count', '100')
         
-        # Calculate price estimate
+        prices = get_prices()
         base_price = float(prices['blender_per_frame'].replace('$', ''))
         multiplier = 1.5 if priority else 1.0
         estimated_total = f"${base_price * int(frame_count) * multiplier:.2f}"
         
-        # Get client info
-        client_info = get_client_info()
-        
-        # Prepare order data
         order_data = {
             'email': email,
             'project_link': project_link,
@@ -223,48 +192,46 @@ def blender_order():
             'base_price': prices['blender_per_frame'],
             'multiplier': f"{multiplier}x",
             'estimated_total': estimated_total,
-            'user_ip': client_info['ip'],
-            'user_agent': client_info['user_agent'][:100] + '...' if len(client_info['user_agent']) > 100 else client_info['user_agent'],
-            'referrer': client_info['referrer']
+            'user_ip': request.headers.get('X-Forwarded-For', request.remote_addr),
+            'user_agent': request.headers.get('User-Agent', 'Unknown')[:100],
+            'timestamp': datetime.now().isoformat()
         }
         
-        # Send to Discord
-        discord_sent = send_discord_order_notification(order_data)
+        notify_new_order(order_data)
         
-        if discord_sent:
-            print(f"✅ Order from {email} sent to Discord")
-        else:
-            print(f"⚠️ Order from {email} saved locally (Discord failed)")
-        
-        # Save order locally (in production, save to database)
-        save_order_locally(order_data)
+        thread = threading.Thread(target=save_order_locally, args=(order_data,))
+        thread.daemon = True
+        thread.start()
         
         return redirect(url_for('order_confirmation', service='blender'))
-    
-    return render_template('blender_order.html', prices=prices)
+        
+    except Exception as e:
+        print(f"Order error: {e}")
+        return redirect(url_for('blender_order'))
 
 def save_order_locally(order_data):
-    """Save order to a local JSON file (for backup)"""
     try:
         orders_file = 'orders.json'
         orders = []
         
         if os.path.exists(orders_file):
-            with open(orders_file, 'r') as f:
-                orders = json.load(f)
+            try:
+                with open(orders_file, 'r') as f:
+                    orders = json.load(f)
+            except:
+                orders = []
         
-        orders.append({
-            **order_data,
-            'timestamp': datetime.now().isoformat(),
-            'id': f"ORD-{int(time.time())}"
-        })
+        order_data['id'] = f"ORD-{int(time.time())}"
+        orders.append(order_data)
+        
+        if len(orders) > 100:
+            orders = orders[-100:]
         
         with open(orders_file, 'w') as f:
             json.dump(orders, f, indent=2)
-        
-        print(f"✅ Order saved locally: {order_data['email']}")
+            
     except Exception as e:
-        print(f"❌ Failed to save order locally: {e}")
+        print(f"Save error: {e}")
 
 @app.route('/order-confirmation/<service>')
 def order_confirmation(service):
@@ -272,103 +239,64 @@ def order_confirmation(service):
 
 @app.route('/api/order', methods=['POST'])
 def api_order():
-    """API endpoint for order submissions"""
+    if request.method != 'POST':
+        return jsonify({'error': 'Method not allowed'}), 405
+    
     try:
-        data = request.json
+        data = request.get_json()
+        if not data:
+            return jsonify({'error': 'No JSON data'}), 400
         
-        # Add client info
-        client_info = get_client_info()
         data.update({
-            'user_ip': client_info['ip'],
-            'user_agent': client_info['user_agent'],
-            'timestamp': datetime.now().isoformat()
+            'user_ip': request.headers.get('X-Forwarded-For', request.remote_addr),
+            'user_agent': request.headers.get('User-Agent', 'Unknown'),
+            'timestamp': datetime.now().isoformat(),
+            'source': 'api'
         })
         
-        # Send to Discord
-        success = send_discord_order_notification(data)
+        notify_new_order(data)
+        save_order_locally(data)
         
-        if success:
-            # Save locally
-            save_order_locally(data)
-            
-            return jsonify({
-                'success': True,
-                'message': 'Order received and notification sent to Discord',
-                'order_id': f"API-{int(time.time())}"
-            })
-        else:
-            return jsonify({
-                'success': False,
-                'message': 'Order saved locally but Discord notification failed'
-            }), 500
-            
-    except Exception as e:
-        print(f"❌ API Order Error: {e}")
-        return jsonify({'error': 'Internal server error'}), 500
-
-@app.route('/webhook/test')
-def test_webhook():
-    """Test the Discord webhook"""
-    success = send_discord_test()
-    
-    if success:
         return jsonify({
             'success': True,
-            'message': 'Test message sent to Discord',
-            'webhook_url': DISCORD_WEBHOOK_URL[:50] + '...'  # Hide full URL
+            'message': 'Order received',
+            'order_id': f"API-{int(time.time())}"
         })
-    else:
-        return jsonify({
-            'success': False,
-            'message': 'Failed to send test message'
-        }), 500
-
-@app.route('/webhook/orders')
-def view_orders():
-    """View saved orders (for admin)"""
-    try:
-        if os.path.exists('orders.json'):
-            with open('orders.json', 'r') as f:
-                orders = json.load(f)
-            return jsonify({
-                'count': len(orders),
-                'orders': orders[-10:]  # Last 10 orders
-            })
-        else:
-            return jsonify({'count': 0, 'orders': []})
-    except:
-        return jsonify({'error': 'Could not load orders'}), 500
-
-@app.route('/api/status')
-def api_status():
-    """API endpoint for service status"""
-    prices = parse_prices()
-    return jsonify({
-        'status': 'development',
-        'message': 'Services under development - Coming soon!',
-        'timestamp': datetime.now().isoformat(),
-        'prices': prices,
-        'user_count': random.randint(1, 15),
-        'server_ping': random.randint(20, 80),
-        'discord_webhook': 'configured' if DISCORD_WEBHOOK_URL else 'not configured'
-    })
+        
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
 
 @app.route('/api/prices')
 def api_prices():
-    """API endpoint for current prices"""
-    prices = parse_prices()
+    prices = get_prices()
     return jsonify(prices)
+
+@app.route('/api/status')
+def api_status():
+    return jsonify({
+        'status': 'online',
+        'timestamp': datetime.now().isoformat(),
+        'service': 'pythons-gpus-store',
+        'version': '1.4.0'
+    })
+
+@app.route('/webhook/test')
+def test_webhook():
+    test_message = f"""```yaml
+✅ WEBHOOK TEST
+════════════════════════════════════════
+• Service: Python's GPUS Server
+• Time: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}
+• Status: ✅ Operational
+════════════════════════════════════════
+```"""
+    
+    send_discord_async(test_message, "🔄 Test Bot")
+    return jsonify({'success': True, 'message': 'Test sent'})
 
 @app.route('/health')
 def health():
-    """Health check endpoint"""
-    return jsonify({
-        'status': 'healthy', 
-        'service': 'pythons-gpus-store',
-        'version': '1.2.0',
-        'timestamp': datetime.now().isoformat(),
-        'discord_webhook': 'active' if DISCORD_WEBHOOK_URL else 'inactive'
-    })
+    return jsonify({'status': 'healthy', 'timestamp': datetime.now().isoformat()})
 
 @app.errorhandler(404)
 def not_found(e):
@@ -376,48 +304,15 @@ def not_found(e):
 
 @app.errorhandler(500)
 def server_error(e):
-    # Send error to Discord (simplified version)
-    error_message = f"""```yaml
+    error_msg = f"""```yaml
 🚨 SERVER ERROR
-════════════════════════════════════════
-• Error: {str(e)}
 • Time: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}
+• Error: {str(e)}
 • Path: {request.path}
-════════════════════════════════════════
 ```"""
-    
-    try:
-        requests.post(DISCORD_WEBHOOK_URL, json={
-            "content": error_message,
-            "username": "Python's GPUS Error Bot"
-        }, timeout=5)
-    except:
-        pass  # Silently fail if Discord is down
-    
+    send_discord_async(error_msg, "🚨 Error Alert")
     return render_template('500.html', error=str(e)), 500
 
-# ===== STARTUP =====
 if __name__ == '__main__':
-    # Send startup notification
-    startup_message = f"""```yaml
-🚀 SERVER STARTED
-════════════════════════════════════════
-• Service: Python's GPUS Store
-• Time: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}
-• Port: {os.environ.get('PORT', 5000)}
-• Environment: {'Production' if os.environ.get('RENDER') else 'Development'}
-════════════════════════════════════════
-Discord webhook is ready to receive orders!
-```"""
-    
-    try:
-        requests.post(DISCORD_WEBHOOK_URL, json={
-            "content": startup_message,
-            "username": "Python's GPUS Server"
-        }, timeout=5)
-        print("✅ Startup notification sent to Discord")
-    except Exception as e:
-        print(f"⚠️ Could not send startup notification: {e}")
-    
     port = int(os.environ.get('PORT', 5000))
-    app.run(host='0.0.0.0', port=port, debug=False)
+    app.run(host='0.0.0.0', port=port, debug=False, threaded=True)
