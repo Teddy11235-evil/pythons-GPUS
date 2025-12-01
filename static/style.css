@@ -741,3 +741,71 @@ textarea.form-control {
 .p-1 { padding: 1rem; }
 .p-2 { padding: 2rem; }
 .p-3 { padding: 3rem; }
+
+/* Form Text Helper */
+.form-text {
+    display: block;
+    margin-top: 0.5rem;
+    color: var(--text-secondary);
+    font-size: 0.875rem;
+    line-height: 1.4;
+}
+
+/* Price Summary Sticky */
+@media (min-width: 993px) {
+    .price-summary-card {
+        position: sticky;
+        top: 100px;
+    }
+}
+
+/* Animation for price updates */
+@keyframes priceUpdate {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.05); }
+    100% { transform: scale(1); }
+}
+
+.price-value.updated {
+    animation: priceUpdate 0.3s ease;
+}
+
+/* Professional focus styles */
+.form-control:focus {
+    border-color: var(--accent-primary);
+    box-shadow: 0 0 0 3px rgba(13, 110, 253, 0.1);
+    outline: none;
+}
+
+/* Hover effects */
+.toggle-container:hover {
+    border-color: var(--accent-primary);
+    background: var(--bg-tertiary);
+    transform: translateY(-1px);
+    transition: all 0.2s ease;
+}
+
+/* Button loading state */
+.btn-loading {
+    position: relative;
+    color: transparent !important;
+}
+
+.btn-loading::after {
+    content: '';
+    position: absolute;
+    width: 20px;
+    height: 20px;
+    top: 50%;
+    left: 50%;
+    margin-left: -10px;
+    margin-top: -10px;
+    border: 2px solid rgba(255,255,255,0.3);
+    border-radius: 50%;
+    border-top-color: white;
+    animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
