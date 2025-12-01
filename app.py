@@ -5,8 +5,8 @@ import os
 
 app = Flask(__name__)
 
-# GitHub raw URL for about.txt (replace with your actual GitHub file URL)
-ABOUT_FILE_URL = "https://raw.githubusercontent.com/yourusername/yourrepo/main/about.txt"
+# Updated with your actual GitHub URL
+ABOUT_FILE_URL = "https://raw.githubusercontent.com/Teddy11235-evil/pythons-GPUS/main/about.txt"
 
 def get_about_content():
     """Fetch about.txt content from GitHub"""
@@ -15,7 +15,7 @@ def get_about_content():
         response.raise_for_status()
         return response.text
     except Exception as e:
-        return f"# About Our Compute Service\n\nUnable to load about information. Error: {str(e)}"
+        return f"# About Our Compute Service\n\nUnable to load about information. Please check the GitHub file exists.\n\nError: {str(e)}"
 
 @app.route('/')
 def home():
@@ -40,6 +40,11 @@ def api_status():
             {'name': 'Enterprise', 'price': '$0.50/min', 'specs': '4 CPU, 8GB RAM, 2 GPU'}
         ]
     })
+
+@app.route('/health')
+def health():
+    """Health check endpoint for Render"""
+    return jsonify({'status': 'healthy', 'service': 'compute-store'})
 
 if __name__ == '__main__':
     port = int(os.environ.get('PORT', 5000))
