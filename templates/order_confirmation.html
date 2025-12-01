@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container confirmation-container">
+    <div class="confirmation-card">
+        <div class="confirmation-icon">
+            <i class="fas fa-check-circle"></i>
+        </div>
+        
+        <h1>Order Request Received!</h1>
+        
+        <div class="confirmation-message">
+            <p>Thank you for your interest in our <strong>{{ service|capitalize }} rendering</strong> service.</p>
+            
+            <div class="development-alert">
+                <i class="fas fa-tools"></i>
+                <h3>Service Under Development</h3>
+                <p>This service is currently being developed. Your request has been recorded and will help us prioritize our development efforts.</p>
+                <p>We'll contact you via email when the service becomes available.</p>
+            </div>
+            
+            <div class="next-steps">
+                <h3><i class="fas fa-list-ol"></i> What Happens Next:</h3>
+                <ol>
+                    <li>We'll review your request within <strong>24 hours</strong></li>
+                    <li>You'll receive an email confirmation</li>
+                    <li>We'll contact you for additional details if needed</li>
+                    <li>You'll be notified when the service launches</li>
+                </ol>
+            </div>
+        </div>
+        
+        <div class="confirmation-actions">
+            <a href="/" class="cta-button">
+                <i class="fas fa-home"></i> Back to Home
+            </a>
+            <a href="/about" class="cta-button secondary">
+                <i class="fas fa-info-circle"></i> Learn More About Us
+            </a>
+        </div>
+        
+        <div class="confirmation-footer">
+            <p><i class="fas fa-envelope"></i> Questions? Email us at <strong>support@pythons-gpus.com</strong></p>
+        </div>
+    </div>
+</div>
+{% endblock %}
