@@ -8,11 +8,12 @@
             </div>
             <div class="status-badge">
                 <span class="pulse-dot"></span>
-                <span id="status-message">Loading...</span>
+                <span id="status-message">Loading services...</span>
             </div>
-            <h1>Python's GPU Services Are Online!</h1>
+            <h1>Python's GPU Services</h1>
             <p class="subtitle">
-                Specialized GPU compute services for Blender rendering, TensorFlow tasks, and hash cracking. Fast, reliable, and affordable.
+                Specialized GPU compute services for Blender rendering, TensorFlow tasks, and hash cracking.
+                <span class="warning-text">⚠️ All services are currently under development</span>
             </p>
             <a href="#services" class="cta-button">View Services & Pricing</a>
         </div>
@@ -25,16 +26,16 @@
                 <p>Projects Completed</p>
             </div>
             <div class="stat-card">
-                <div class="stat-number">$0.04</div>
+                <div class="stat-number" id="blender-price">{{ prices.blender_per_frame }}</div>
                 <p>Per Frame (Blender)</p>
             </div>
             <div class="stat-card">
-                <div class="stat-number">$0.05</div>
-                <p>Per Minute (Hash Cracking)</p>
+                <div class="stat-number" id="hash-price">{{ prices.hash_per_minute }}</div>
+                <p>Per Minute (Hash)</p>
             </div>
             <div class="stat-card">
-                <div class="stat-number">99.8%</div>
-                <p>Uptime</p>
+                <div class="stat-number" id="priority-multiplier">{{ prices.priority_multiplier }}</div>
+                <p>Priority Multiplier</p>
             </div>
         </div>
     </section>
@@ -44,63 +45,72 @@
             <h2 class="section-title">Our Specialized Services</h2>
             <div class="services-grid">
                 <!-- Blender Rendering -->
-                <div class="service-card available">
+                <div class="service-card">
+                    <div class="service-tags">
+                        <span class="tag development-tag">Under Development</span>
+                        <span class="tag working-tag">Being Worked On</span>
+                    </div>
                     <div class="service-icon">
                         <i class="fas fa-cube"></i>
                     </div>
                     <h3>Blender Rendering</h3>
-                    <div class="service-badge available-badge">Available</div>
-                    <p class="price">$0.04 per frame</p>
+                    <p class="price" id="dynamic-blender-price">{{ prices.blender_per_frame }} per frame</p>
                     <ul class="features">
                         <li>GPU-accelerated Cycles rendering</li>
                         <li>Blender 3.0+ support</li>
                         <li>Complex scene handling</li>
                         <li>Fast frame delivery</li>
                     </ul>
-                    <button class="cta-button" onclick="showOrderModal('blender')">Order Render Job</button>
+                    <a href="/blender-order" class="cta-button">Order Render Job</a>
                 </div>
 
                 <!-- TensorFlow GPU -->
-                <div class="service-card available">
+                <div class="service-card">
+                    <div class="service-tags">
+                        <span class="tag development-tag">Under Development</span>
+                    </div>
                     <div class="service-icon">
                         <i class="fas fa-brain"></i>
                     </div>
                     <h3>TensorFlow Compute</h3>
-                    <div class="service-badge available-badge">Available</div>
-                    <p class="price">From $0.10/min</p>
+                    <p class="price" id="dynamic-tf-price">From {{ prices.tensorflow_base }}/min</p>
                     <ul class="features">
                         <li>TensorFlow GPU acceleration</li>
                         <li>Custom Python environments</li>
                         <li>Model training & inference</li>
                         <li>Real-time monitoring</li>
                     </ul>
-                    <button class="cta-button" onclick="showOrderModal('tensorflow')">Start TF Job</button>
+                    <button class="cta-button" onclick="showComingSoon('tensorflow')">Coming Soon</button>
                 </div>
 
                 <!-- Hash Cracking -->
-                <div class="service-card available">
+                <div class="service-card">
+                    <div class="service-tags">
+                        <span class="tag development-tag">Under Development</span>
+                    </div>
                     <div class="service-icon">
                         <i class="fas fa-lock"></i>
                     </div>
                     <h3>Hash Cracking</h3>
-                    <div class="service-badge available-badge">Available</div>
-                    <p class="price">$0.05 per minute</p>
+                    <p class="price" id="dynamic-hash-price">{{ prices.hash_per_minute }} per minute</p>
                     <ul class="features">
                         <li>GPU-accelerated cracking</li>
                         <li>Multiple hash types</li>
                         <li>Custom wordlist support</li>
                         <li>Fast results delivery</li>
                     </ul>
-                    <button class="cta-button" onclick="showOrderModal('hashcracking')">Submit Hash Job</button>
+                    <button class="cta-button" onclick="showComingSoon('hashcracking')">Coming Soon</button>
                 </div>
 
                 <!-- Hosting (Unavailable) -->
                 <div class="service-card unavailable">
+                    <div class="service-tags">
+                        <span class="tag development-tag">Under Development</span>
+                    </div>
                     <div class="service-icon">
                         <i class="fas fa-server"></i>
                     </div>
                     <h3>Hosting Services</h3>
-                    <div class="service-badge unavailable-badge">Coming Soon</div>
                     <p class="price">Not Available</p>
                     <ul class="features">
                         <li>GPU server hosting</li>
@@ -108,7 +118,7 @@
                         <li>24/7 uptime</li>
                         <li>Managed services</li>
                     </ul>
-                    <button class="cta-button" disabled>Notify Me When Available</button>
+                    <button class="cta-button" disabled>Notify Me</button>
                 </div>
             </div>
         </div>
@@ -138,30 +148,40 @@
         </div>
     </section>
 
-    <!-- Order Modal (hidden by default) -->
-    <div id="orderModal" class="modal">
+    <!-- The Rock Meme Section -->
+    <section class="rock-section">
+        <div class="container">
+            <div class="rock-meme">
+                <div class="rock">
+                    <div class="rock-face">🗿</div>
+                    <div class="rock-speech">"Your IP: <span id="user-ip">Loading...</span><br>
+                    Ping: <span id="server-ping">--</span>ms<br>
+                    Users online: <span id="online-users">{{ user_count }}</span></div>
+                </div>
+                <div class="rock-caption">
+                    <p>The Ancient Server Stone knows all...</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Coming Soon Modal -->
+    <div id="comingSoonModal" class="modal">
         <div class="modal-content">
-            <span class="close-modal" onclick="closeModal()">&times;</span>
-            <h2 id="modalTitle">Order Service</h2>
-            <form id="orderForm">
-                <div class="form-group">
-                    <label for="serviceType">Service Type</label>
-                    <input type="text" id="serviceType" readonly>
+            <span class="close-modal" onclick="closeModal('comingSoonModal')">&times;</span>
+            <div class="coming-soon-content">
+                <i class="fas fa-tools"></i>
+                <h2>Service Under Development</h2>
+                <p id="modal-service-name">This service is currently being developed and will be available soon.</p>
+                <p>We're working hard to bring you the best GPU compute experience!</p>
+                <div class="progress-container">
+                    <div class="progress-bar">
+                        <div class="progress-fill" id="progress-fill"></div>
+                    </div>
+                    <div class="progress-text">Development in progress...</div>
                 </div>
-                <div class="form-group">
-                    <label for="email">Your Email</label>
-                    <input type="email" id="email" required placeholder="you@example.com">
-                </div>
-                <div class="form-group">
-                    <label for="details">Job Details</label>
-                    <textarea id="details" required placeholder="Describe your task, provide specifications, or ask questions..."></textarea>
-                </div>
-                <div class="form-group">
-                    <label for="budget">Estimated Budget</label>
-                    <input type="text" id="budget" placeholder="e.g., $20 for 500 frames">
-                </div>
-                <button type="submit" class="cta-button">Submit Job Inquiry</button>
-            </form>
+                <button class="cta-button" onclick="closeModal('comingSoonModal')">Got It!</button>
+            </div>
         </div>
     </div>
 {% endblock %}
