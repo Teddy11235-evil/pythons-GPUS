@@ -1,0 +1,136 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container order-container">
+    <a href="/" class="back-button">
+        <i class="fas fa-arrow-left"></i> Back to Home
+    </a>
+    
+    <div class="order-header">
+        <h1>Blender Rendering Order</h1>
+        <div class="service-tags">
+            <span class="tag development-tag">Under Development</span>
+            <span class="tag working-tag">Being Worked On</span>
+        </div>
+        <p class="order-subtitle">Submit your Blender project for GPU rendering. Current price: <strong>{{ prices.blender_per_frame }} per frame</strong></p>
+    </div>
+    
+    <div class="order-content">
+        <div class="order-form-container">
+            <form method="POST" class="order-form">
+                <div class="form-group">
+                    <label for="email">Your Email *</label>
+                    <input type="email" id="email" name="email" required placeholder="you@example.com">
+                    <small>We'll contact you at this address</small>
+                </div>
+                
+                <div class="form-group">
+                    <label for="project_link">Project Link *</label>
+                    <input type="url" id="project_link" name="project_link" required 
+                           placeholder="https://onedrive.live.com/... or https://github.com/...">
+                    <small>Share your .blend file via OneDrive, Google Drive, GitHub, or similar</small>
+                </div>
+                
+                <div class="form-group">
+                    <label for="frame_count">Estimated Frame Count</label>
+                    <input type="number" id="frame_count" name="frame_count" min="1" value="100" 
+                           onchange="updatePriceEstimate()">
+                    <small>Estimated total frames to render</small>
+                </div>
+                
+                <div class="form-group toggle-group">
+                    <label class="toggle-label">
+                        <input type="checkbox" id="bargain" name="bargain" onchange="updatePriceEstimate()">
+                        <span class="toggle-slider"></span>
+                        <span class="toggle-text">I want to bargain the price</span>
+                    </label>
+                    <small>Check this if you'd like to negotiate a custom price</small>
+                </div>
+                
+                <div class="form-group toggle-group">
+                    <label class="toggle-label">
+                        <input type="checkbox" id="priority" name="priority" onchange="updatePriceEstimate()">
+                        <span class="toggle-slider"></span>
+                        <span class="toggle-text">High Priority ({{ prices.priority_multiplier }} price)</span>
+                    </label>
+                    <small>Your job will be moved to the front of the queue</small>
+                </div>
+                
+                <div class="form-group">
+                    <label for="notes">Additional Notes</label>
+                    <textarea id="notes" name="notes" rows="4" 
+                              placeholder="Blender version, render settings, special requirements..."></textarea>
+                </div>
+                
+                <div class="price-estimate">
+                    <h3>Price Estimate</h3>
+                    <div class="price-breakdown">
+                        <div class="price-line">
+                            <span>Base price (per frame):</span>
+                            <span>{{ prices.blender_per_frame }}</span>
+                        </div>
+                        <div class="price-line">
+                            <span>Priority multiplier:</span>
+                            <span id="multiplier-display">1x</span>
+                        </div>
+                        <div class="price-line total">
+                            <span>Estimated total:</span>
+                            <span id="total-estimate">$4.00</span>
+                        </div>
+                    </div>
+                    <small class="estimate-note">This is an estimate. Final price may vary based on render complexity.</small>
+                </div>
+                
+                <div class="development-notice">
+                    <i class="fas fa-exclamation-triangle"></i>
+                    <p><strong>Note:</strong> This service is currently under development. By submitting, you're expressing interest and helping us prioritize development. We'll contact you when the service is ready.</p>
+                </div>
+                
+                <button type="submit" class="cta-button submit-button">
+                    <i class="fas fa-paper-plane"></i> Submit Order Request
+                </button>
+            </form>
+        </div>
+        
+        <div class="order-info">
+            <h3><i class="fas fa-info-circle"></i> How It Works</h3>
+            <ol class="info-steps">
+                <li><strong>Submit this form</strong> with your project details</li>
+                <li><strong>We'll review</strong> your project and contact you within 24 hours</li>
+                <li><strong>Confirm details</strong> and provide any additional information needed</li>
+                <li><strong>We render</strong> your frames on our GPU servers</li>
+                <li><strong>You receive</strong> the rendered frames via download link</li>
+            </ol>
+            
+            <div class="requirements">
+                <h4><i class="fas fa-check-circle"></i> Requirements</h4>
+                <ul>
+                    <li>Blender 3.0 or higher</li>
+                    <li>Project must be self-contained or include all assets</li>
+                    <li>Render settings should be pre-configured</li>
+                    <li>Large files (>500MB) may require special arrangements</li>
+                </ul>
+            </div>
+            
+            <div class="contact-support">
+                <h4><i class="fas fa-question-circle"></i> Questions?</h4>
+                <p>Email us at <strong>support@pythons-gpus.com</strong> or join our Discord server for help.</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+function updatePriceEstimate() {
+    const basePrice = {{ prices.blender_per_frame|replace('$', '')|float }};
+    const frameCount = parseInt(document.getElementById('frame_count').value) || 100;
+    const priority = document.getElementById('priority').checked;
+    const multiplier = priority ? 1.5 : 1.0;
+    
+    const total = basePrice * frameCount * multiplier;
+    
+    document.getElementById('multiplier-display').textContent = multiplier + 'x';
+    document.getElementById('total-estimate').textContent = '$' + total.toFixed(2);
+}
+</script>
+{% endblock %}
