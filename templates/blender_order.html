@@ -133,4 +133,77 @@ function updatePriceEstimate() {
     document.getElementById('total-estimate').textContent = '$' + total.toFixed(2);
 }
 </script>
+<!-- Add this at the bottom of blender_order.html, before closing the block -->
+<script>
+function updatePriceEstimate() {
+    const basePrice = {{ prices.blender_per_frame|replace('$', '')|float }};
+    const frameCount = parseInt(document.getElementById('frame_count').value) || 100;
+    const priority = document.getElementById('priority').checked;
+    const multiplier = priority ? 1.5 : 1.0;
+    
+    const total = basePrice * frameCount * multiplier;
+    
+    document.getElementById('multiplier-display').textContent = multiplier + 'x';
+    document.getElementById('total-estimate').textContent = '$' + total.toFixed(2);
+}
+
+// Enhanced form submission
+document.addEventListener('DOMContentLoaded', function() {
+    const orderForm = document.querySelector('.order-form');
+    if (orderForm) {
+        orderForm.addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            // Collect form data
+            const formData = {
+                email: document.getElementById('email').value,
+                project_link: document.getElementById('project_link').value,
+                bargain: document.getElementById('bargain').checked,
+                priority: document.getElementById('priority').checked,
+                notes: document.getElementById('notes').value,
+                frame_count: document.getElementById('frame_count').value,
+                service_type: 'Blender Rendering',
+                base_price: '{{ prices.blender_per_frame }}',
+                multiplier: document.getElementById('priority').checked ? '1.5x' : '1x',
+                estimated_total: document.getElementById('total-estimate').textContent
+            };
+            
+            // Show loading state
+            const submitButton = document.querySelector('.submit-button');
+            const originalText = submitButton.innerHTML;
+            submitButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Sending Order...';
+            submitButton.disabled = true;
+            
+            try {
+                // Submit via API
+                const response = await fetch('/api/order', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(formData)
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    // Also submit the regular form for server-side processing
+                    orderForm.submit();
+                } else {
+                    alert('Order submitted but Discord notification failed. Your order is still saved.');
+                    orderForm.submit();
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                alert('There was an error submitting your order. Please try again.');
+                submitButton.innerHTML = originalText;
+                submitButton.disabled = false;
+            }
+        });
+    }
+    
+    // Update price on load
+    updatePriceEstimate();
+});
+</script>
 {% endblock %}
