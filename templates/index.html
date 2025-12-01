@@ -10,84 +10,158 @@
                 <span class="pulse-dot"></span>
                 <span id="status-message">Loading...</span>
             </div>
-            <h1>Python's GPU Compute Is Coming Up!</h1>
+            <h1>Python's GPU Services Are Online!</h1>
             <p class="subtitle">
-                Rent high-performance GPU resources for your Python tasks. Scalable, reliable, and cost-effective computing solutions.
+                Specialized GPU compute services for Blender rendering, TensorFlow tasks, and hash cracking. Fast, reliable, and affordable.
             </p>
-            <a href="#services" class="cta-button">Get Started Now</a>
+            <a href="#services" class="cta-button">View Services & Pricing</a>
         </div>
     </section>
 
     <section class="stats">
         <div class="container">
             <div class="stat-card">
-                <div class="stat-number">99.9%</div>
-                <p>Uptime SLA</p>
+                <div class="stat-number">5</div>
+                <p>Projects Completed</p>
             </div>
             <div class="stat-card">
-                <div class="stat-number">24/7</div>
-                <p>Support Available</p>
+                <div class="stat-number">$0.04</div>
+                <p>Per Frame (Blender)</p>
             </div>
             <div class="stat-card">
-                <div class="stat-number">500+</div>
-                <p>Tasks Completed</p>
+                <div class="stat-number">$0.05</div>
+                <p>Per Minute (Hash Cracking)</p>
             </div>
             <div class="stat-card">
-                <div class="stat-number">50ms</div>
-                <p>Average Response Time</p>
+                <div class="stat-number">99.8%</div>
+                <p>Uptime</p>
             </div>
         </div>
     </section>
 
     <section class="services" id="services">
         <div class="container">
-            <h2 class="section-title">Our Compute Services</h2>
+            <h2 class="section-title">Our Specialized Services</h2>
             <div class="services-grid">
-                <div class="service-card">
+                <!-- Blender Rendering -->
+                <div class="service-card available">
                     <div class="service-icon">
-                        <i class="fas fa-code"></i>
+                        <i class="fas fa-cube"></i>
                     </div>
-                    <h3>Python GPU Tasks</h3>
-                    <p class="price">$0.10 / min</p>
+                    <h3>Blender Rendering</h3>
+                    <div class="service-badge available-badge">Available</div>
+                    <p class="price">$0.04 per frame</p>
                     <ul class="features">
-                        <li>NVIDIA GPU Acceleration</li>
-                        <li>Python 3.9+ Environment</li>
-                        <li>8GB GPU Memory</li>
-                        <li>Real-time Monitoring</li>
+                        <li>GPU-accelerated Cycles rendering</li>
+                        <li>Blender 3.0+ support</li>
+                        <li>Complex scene handling</li>
+                        <li>Fast frame delivery</li>
                     </ul>
-                    <button class="cta-button">Start Computing</button>
+                    <button class="cta-button" onclick="showOrderModal('blender')">Order Render Job</button>
                 </div>
 
-                <div class="service-card">
+                <!-- TensorFlow GPU -->
+                <div class="service-card available">
                     <div class="service-icon">
                         <i class="fas fa-brain"></i>
                     </div>
-                    <h3>ML Model Training</h3>
-                    <p class="price">$0.25 / min</p>
+                    <h3>TensorFlow Compute</h3>
+                    <div class="service-badge available-badge">Available</div>
+                    <p class="price">From $0.10/min</p>
                     <ul class="features">
-                        <li>Multi-GPU Support</li>
-                        <li>TensorFlow/PyTorch Ready</li>
-                        <li>Data Pipeline Integration</li>
-                        <li>Checkpoint Storage</li>
+                        <li>TensorFlow GPU acceleration</li>
+                        <li>Custom Python environments</li>
+                        <li>Model training & inference</li>
+                        <li>Real-time monitoring</li>
                     </ul>
-                    <button class="cta-button">Train Models</button>
+                    <button class="cta-button" onclick="showOrderModal('tensorflow')">Start TF Job</button>
                 </div>
 
-                <div class="service-card">
+                <!-- Hash Cracking -->
+                <div class="service-card available">
                     <div class="service-icon">
-                        <i class="fas fa-database"></i>
+                        <i class="fas fa-lock"></i>
                     </div>
-                    <h3>Data Processing</h3>
-                    <p class="price">$0.15 / min</p>
+                    <h3>Hash Cracking</h3>
+                    <div class="service-badge available-badge">Available</div>
+                    <p class="price">$0.05 per minute</p>
                     <ul class="features">
-                        <li>Parallel Processing</li>
-                        <li>Large Dataset Support</li>
-                        <li>Spark Integration</li>
-                        <li>Result Export</li>
+                        <li>GPU-accelerated cracking</li>
+                        <li>Multiple hash types</li>
+                        <li>Custom wordlist support</li>
+                        <li>Fast results delivery</li>
                     </ul>
-                    <button class="cta-button">Process Data</button>
+                    <button class="cta-button" onclick="showOrderModal('hashcracking')">Submit Hash Job</button>
+                </div>
+
+                <!-- Hosting (Unavailable) -->
+                <div class="service-card unavailable">
+                    <div class="service-icon">
+                        <i class="fas fa-server"></i>
+                    </div>
+                    <h3>Hosting Services</h3>
+                    <div class="service-badge unavailable-badge">Coming Soon</div>
+                    <p class="price">Not Available</p>
+                    <ul class="features">
+                        <li>GPU server hosting</li>
+                        <li>Dedicated resources</li>
+                        <li>24/7 uptime</li>
+                        <li>Managed services</li>
+                    </ul>
+                    <button class="cta-button" disabled>Notify Me When Available</button>
                 </div>
             </div>
         </div>
     </section>
+
+    <!-- How It Works Section -->
+    <section class="how-it-works">
+        <div class="container">
+            <h2 class="section-title">How It Works</h2>
+            <div class="steps-grid">
+                <div class="step-card">
+                    <div class="step-number">1</div>
+                    <h3>Submit Your Task</h3>
+                    <p>Upload your Blender file, Python script, or hash file through our simple interface.</p>
+                </div>
+                <div class="step-card">
+                    <div class="step-number">2</div>
+                    <h3>We Process It</h3>
+                    <p>Our GPU servers process your task with real-time monitoring and updates.</p>
+                </div>
+                <div class="step-card">
+                    <div class="step-number">3</div>
+                    <h3>Get Results</h3>
+                    <p>Download your rendered frames, model outputs, or cracked hashes immediately.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Order Modal (hidden by default) -->
+    <div id="orderModal" class="modal">
+        <div class="modal-content">
+            <span class="close-modal" onclick="closeModal()">&times;</span>
+            <h2 id="modalTitle">Order Service</h2>
+            <form id="orderForm">
+                <div class="form-group">
+                    <label for="serviceType">Service Type</label>
+                    <input type="text" id="serviceType" readonly>
+                </div>
+                <div class="form-group">
+                    <label for="email">Your Email</label>
+                    <input type="email" id="email" required placeholder="you@example.com">
+                </div>
+                <div class="form-group">
+                    <label for="details">Job Details</label>
+                    <textarea id="details" required placeholder="Describe your task, provide specifications, or ask questions..."></textarea>
+                </div>
+                <div class="form-group">
+                    <label for="budget">Estimated Budget</label>
+                    <input type="text" id="budget" placeholder="e.g., $20 for 500 frames">
+                </div>
+                <button type="submit" class="cta-button">Submit Job Inquiry</button>
+            </form>
+        </div>
+    </div>
 {% endblock %}
