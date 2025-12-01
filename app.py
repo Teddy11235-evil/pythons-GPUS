@@ -31,20 +31,55 @@ def api_status():
     """API endpoint for service status"""
     return jsonify({
         'status': 'operational',
-        'message': 'Python GPU services are coming up!',
+        'message': 'Python GPU services are online! Ready for compute tasks.',
         'timestamp': datetime.now().isoformat(),
-        'available_services': ['Python GPU Tasks', 'Data Processing', 'ML Model Training'],
-        'pricing_tiers': [
-            {'name': 'Basic', 'price': '$0.10/min', 'specs': '1 CPU, 2GB RAM'},
-            {'name': 'Pro', 'price': '$0.25/min', 'specs': '2 CPU, 4GB RAM, 1 GPU'},
-            {'name': 'Enterprise', 'price': '$0.50/min', 'specs': '4 CPU, 8GB RAM, 2 GPU'}
+        'stats': {
+            'projects_completed': 5,
+            'uptime': '99.8%',
+            'response_time': '45ms'
+        }
+    })
+
+@app.route('/api/services')
+def api_services():
+    """API endpoint for available services"""
+    return jsonify({
+        'services': [
+            {
+                'name': 'Blender Rendering',
+                'price': '$0.04 per frame',
+                'description': 'High-quality 3D rendering with Blender',
+                'status': 'available',
+                'icon': 'fas fa-cube'
+            },
+            {
+                'name': 'TensorFlow GPU Compute',
+                'price': 'Starting at $0.10/min',
+                'description': 'TensorFlow machine learning tasks',
+                'status': 'available',
+                'icon': 'fas fa-brain'
+            },
+            {
+                'name': 'Hash Cracking',
+                'price': '$0.05 per minute',
+                'description': 'GPU-accelerated hash cracking',
+                'status': 'available',
+                'icon': 'fas fa-lock'
+            },
+            {
+                'name': 'Hosting',
+                'price': 'Currently unavailable',
+                'description': 'Coming soon - check back later',
+                'status': 'unavailable',
+                'icon': 'fas fa-server'
+            }
         ]
     })
 
 @app.route('/health')
 def health():
     """Health check endpoint for Render"""
-    return jsonify({'status': 'healthy', 'service': 'compute-store'})
+    return jsonify({'status': 'healthy', 'service': 'pythons-gpus-store'})
 
 if __name__ == '__main__':
     port = int(os.environ.get('PORT', 5000))
