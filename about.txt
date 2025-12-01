@@ -1,0 +1,60 @@
+# About our upcoming ComputeStore
+
+##We are barely starting so this is what we got for now:
+-Nvidea MX50
+-Multiple icore 7
+-3D printers
+
+##Coming up  if this woks out:)
+-Coral TPU farm
+-Mass storage units
+-Beefy Nvidea GPU's(4090-5060)
+-Custom pcb servers
+-Extras like advertisement and 3D printing service
+
+## Our Mission
+We provide accessible, high-performance computing resources for developers and researchers. Our platform enables you to rent GPU and CPU resources on-demand for your Python tasks, rendering projects, or hash cracking.
+
+## Why Choose Us?
+
+### 🚀 Performance
+- Optimized Python environments
+- Mid-latency networking
+-Upcoming GPU upgrades
+
+### 💰 Cost-Effective
+- Pay-per-minute pricing
+- No upfront costs
+- Automatic scaling
+
+### 🔒 Reliability
+- 90% uptime SLA
+- Data isolation and security
+- Automatic backups
+
+## How It Works
+1. **Select** your compute requirements and task
+2. **Upload** your .blend, hash or dockerfile
+3. **Monitor** execution in real-time
+4. **Download** results instantly
+
+## Use Cases
+- Machine Learning Model Training
+- Blender rendering
+- Hash cracking(password recovery)
+- Parallel Computing Tasks
+
+## Technology Stack
+- **Infrastructure**: NVIDIA GPUs, High-speed SSDs
+- **Orchestration**: Docker
+- **Monitoring**: Our custom made software
+- **Security**: TLS encryption, Isolated containers
+
+## Getting Started
+Visit our homepage to select a compute plan and start your first task in minutes.
+
+## Support
+Need help? Contact our support team 24/7 at bageltigistudios@gmail.com
+
+---
+*Last Updated: 2024*
