@@ -1,126 +1,164 @@
 {% extends "base.html" %}
 
+{% block title %}Blender Order - Python's GPUs{% endblock %}
+
 {% block content %}
 <div class="container order-container">
-    <a href="/" class="back-button">
+    <a href="/" class="btn btn-secondary mb-3">
         <i class="fas fa-arrow-left"></i> Back to Home
     </a>
     
-    <div class="order-header">
-        <h1>Blender Rendering Order</h1>
-        <div class="service-tags">
-            <span class="tag development-tag">Under Development</span>
-            <span class="tag working-tag">Being Worked On</span>
+    <div class="order-card">
+        <div class="order-header">
+            <h1 class="mb-2">Blender Rendering Order</h1>
+            <div class="service-tags mb-3">
+                <span class="tag dev-tag">Under Development</span>
+                <span class="tag work-tag">Active Development</span>
+            </div>
+            <p class="order-subtitle">
+                Submit your Blender project for GPU rendering. Current price: <strong>{{ prices.blender_per_frame }} per frame</strong>
+            </p>
         </div>
-        <p class="order-subtitle">Submit your Blender project for GPU rendering. Current price: <strong>{{ prices.blender_per_frame }} per frame</strong></p>
-    </div>
-    
-    <div class="order-content">
-        <div class="order-form-container">
-            <form method="POST" class="order-form">
-                <div class="form-group">
-                    <label for="email">Your Email *</label>
-                    <input type="email" id="email" name="email" required placeholder="you@example.com">
-                    <small>We'll contact you at this address</small>
-                </div>
-                
-                <div class="form-group">
-                    <label for="project_link">Project Link *</label>
-                    <input type="url" id="project_link" name="project_link" required 
-                           placeholder="https://onedrive.live.com/... or https://github.com/...">
-                    <small>Share your .blend file via OneDrive, Google Drive, GitHub, or similar</small>
-                </div>
-                
-                <div class="form-group">
-                    <label for="frame_count">Estimated Frame Count</label>
-                    <input type="number" id="frame_count" name="frame_count" min="1" value="100" 
-                           onchange="updatePriceEstimate()">
-                    <small>Estimated total frames to render</small>
-                </div>
-                
-                <div class="form-group toggle-group">
-                    <label class="toggle-label">
-                        <input type="checkbox" id="bargain" name="bargain" onchange="updatePriceEstimate()">
-                        <span class="toggle-slider"></span>
-                        <span class="toggle-text">I want to bargain the price</span>
-                    </label>
-                    <small>Check this if you'd like to negotiate a custom price</small>
-                </div>
-                
-                <div class="form-group toggle-group">
-                    <label class="toggle-label">
-                        <input type="checkbox" id="priority" name="priority" onchange="updatePriceEstimate()">
-                        <span class="toggle-slider"></span>
-                        <span class="toggle-text">High Priority ({{ prices.priority_multiplier }} price)</span>
-                    </label>
-                    <small>Your job will be moved to the front of the queue</small>
-                </div>
-                
-                <div class="form-group">
-                    <label for="notes">Additional Notes</label>
-                    <textarea id="notes" name="notes" rows="4" 
-                              placeholder="Blender version, render settings, special requirements..."></textarea>
-                </div>
-                
-                <div class="price-estimate">
-                    <h3>Price Estimate</h3>
-                    <div class="price-breakdown">
-                        <div class="price-line">
-                            <span>Base price (per frame):</span>
-                            <span>{{ prices.blender_per_frame }}</span>
+        
+        <div class="order-content">
+            <div class="order-form-container">
+                <form method="POST" class="order-form" onsubmit="return handleFormSubmit()">
+                    <!-- Email -->
+                    <div class="form-group">
+                        <label for="email" class="form-label">
+                            <i class="fas fa-envelope"></i> Your Email *
+                        </label>
+                        <input type="email" id="email" name="email" class="form-control" 
+                               required placeholder="you@example.com">
+                        <small class="form-text">We'll contact you at this address</small>
+                    </div>
+                    
+                    <!-- Project Link -->
+                    <div class="form-group">
+                        <label for="project_link" class="form-label">
+                            <i class="fas fa-link"></i> Project Link *
+                        </label>
+                        <input type="url" id="project_link" name="project_link" class="form-control"
+                               required placeholder="https://drive.google.com/... or https://github.com/...">
+                        <small class="form-text">Share your .blend file via cloud storage</small>
+                    </div>
+                    
+                    <!-- Frame Count -->
+                    <div class="form-group">
+                        <label for="frame_count" class="form-label">
+                            <i class="fas fa-film"></i> Estimated Frame Count
+                        </label>
+                        <input type="number" id="frame_count" name="frame_count" class="form-control"
+                               min="1" value="100" onchange="updatePriceEstimate()">
+                        <small class="form-text">Approximate number of frames to render</small>
+                    </div>
+                    
+                    <!-- Toggle: Bargain -->
+                    <div class="form-group">
+                        <div class="form-toggle">
+                            <label class="toggle-switch toggle-small">
+                                <input type="checkbox" id="bargain" name="bargain" 
+                                       onchange="updatePriceEstimate()">
+                                <span class="toggle-slider"></span>
+                            </label>
+                            <label for="bargain" class="toggle-label">
+                                <i class="fas fa-handshake"></i> I want to bargain the price
+                            </label>
                         </div>
-                        <div class="price-line">
+                        <small class="form-text">Check this if you'd like to negotiate a custom price</small>
+                    </div>
+                    
+                    <!-- Toggle: Priority -->
+                    <div class="form-group">
+                        <div class="form-toggle">
+                            <label class="toggle-switch toggle-small">
+                                <input type="checkbox" id="priority" name="priority" 
+                                       onchange="updatePriceEstimate()">
+                                <span class="toggle-slider"></span>
+                            </label>
+                            <label for="priority" class="toggle-label">
+                                <i class="fas fa-bolt"></i> High Priority ({{ prices.priority_multiplier }} price)
+                            </label>
+                        </div>
+                        <small class="form-text">Your job will be moved to the front of the queue</small>
+                    </div>
+                    
+                    <!-- Notes -->
+                    <div class="form-group">
+                        <label for="notes" class="form-label">
+                            <i class="fas fa-sticky-note"></i> Additional Notes
+                        </label>
+                        <textarea id="notes" name="notes" class="form-control" rows="4"
+                                  placeholder="Blender version, render settings, special requirements..."></textarea>
+                    </div>
+                    
+                    <!-- Price Estimate -->
+                    <div class="price-summary">
+                        <h3 class="mb-2">Price Estimate</h3>
+                        <div class="price-row">
+                            <span>Base price ({{ prices.blender_per_frame }}/frame):</span>
+                            <span id="base-price-display">{{ prices.blender_per_frame }}</span>
+                        </div>
+                        <div class="price-row">
                             <span>Priority multiplier:</span>
                             <span id="multiplier-display">1x</span>
                         </div>
-                        <div class="price-line total">
+                        <div class="price-row price-total">
                             <span>Estimated total:</span>
                             <span id="total-estimate">$4.00</span>
                         </div>
+                        <small class="form-text">This is an estimate. Final price may vary.</small>
                     </div>
-                    <small class="estimate-note">This is an estimate. Final price may vary based on render complexity.</small>
-                </div>
-                
-                <div class="development-notice">
-                    <i class="fas fa-exclamation-triangle"></i>
-                    <p><strong>Note:</strong> This service is currently under development. By submitting, you're expressing interest and helping us prioritize development. We'll contact you when the service is ready.</p>
-                </div>
-                
-                <button type="submit" class="cta-button submit-button">
-                    <i class="fas fa-paper-plane"></i> Submit Order Request
-                </button>
-            </form>
-        </div>
-        
-        <div class="order-info">
-            <h3><i class="fas fa-info-circle"></i> How It Works</h3>
-            <ol class="info-steps">
-                <li><strong>Submit this form</strong> with your project details</li>
-                <li><strong>We'll review</strong> your project and contact you within 24 hours</li>
-                <li><strong>Confirm details</strong> and provide any additional information needed</li>
-                <li><strong>We render</strong> your frames on our GPU servers</li>
-                <li><strong>You receive</strong> the rendered frames via download link</li>
-            </ol>
-            
-            <div class="requirements">
-                <h4><i class="fas fa-check-circle"></i> Requirements</h4>
-                <ul>
-                    <li>Blender 3.0 or higher</li>
-                    <li>Project must be self-contained or include all assets</li>
-                    <li>Render settings should be pre-configured</li>
-                    <li>Large files (>500MB) may require special arrangements</li>
-                </ul>
+                    
+                    <!-- Development Notice -->
+                    <div class="development-notice mb-3">
+                        <i class="fas fa-tools"></i>
+                        <div>
+                            <strong>Important Notice:</strong>
+                            <p>This service is currently under development. By submitting, you're expressing interest 
+                               and helping us prioritize development. We'll contact you when the service is ready.</p>
+                        </div>
+                    </div>
+                    
+                    <!-- Submit Button -->
+                    <button type="submit" class="btn btn-primary btn-full" id="submit-btn">
+                        <i class="fas fa-paper-plane"></i> Submit Order Request
+                    </button>
+                </form>
             </div>
             
-            <div class="contact-support">
-                <h4><i class="fas fa-question-circle"></i> Questions?</h4>
-                <p>Email us at <strong>support@pythons-gpus.com</strong> or join our Discord server for help.</p>
+            <div class="order-info">
+                <h3 class="mb-2"><i class="fas fa-info-circle"></i> How It Works</h3>
+                <ol class="info-steps mb-3">
+                    <li><strong>Submit this form</strong> with your project details</li>
+                    <li><strong>We review</strong> your project within 24 hours</li>
+                    <li><strong>Confirm details</strong> and provide payment info</li>
+                    <li><strong>We render</strong> your frames on our GPU servers</li>
+                    <li><strong>You receive</strong> rendered frames via download link</li>
+                </ol>
+                
+                <div class="requirements mb-3">
+                    <h4 class="mb-1"><i class="fas fa-check-circle"></i> Requirements</h4>
+                    <ul class="service-features">
+                        <li>Blender 3.0 or higher</li>
+                        <li>Project must include all assets</li>
+                        <li>Render settings pre-configured</li>
+                        <li>Large files may require special handling</li>
+                    </ul>
+                </div>
+                
+                <div class="contact-support">
+                    <h4 class="mb-1"><i class="fas fa-question-circle"></i> Questions?</h4>
+                    <p>Email us at <strong>support@pythons-gpus.com</strong></p>
+                    <p><small>Typical response time: 24 hours</small></p>
+                </div>
             </div>
         </div>
     </div>
 </div>
 
 <script>
+// Price calculation
 function updatePriceEstimate() {
     const basePrice = {{ prices.blender_per_frame|replace('$', '')|float }};
     const frameCount = parseInt(document.getElementById('frame_count').value) || 100;
@@ -129,81 +167,178 @@ function updatePriceEstimate() {
     
     const total = basePrice * frameCount * multiplier;
     
-    document.getElementById('multiplier-display').textContent = multiplier + 'x';
-    document.getElementById('total-estimate').textContent = '$' + total.toFixed(2);
-}
-</script>
-<!-- Add this at the bottom of blender_order.html, before closing the block -->
-<script>
-function updatePriceEstimate() {
-    const basePrice = {{ prices.blender_per_frame|replace('$', '')|float }};
-    const frameCount = parseInt(document.getElementById('frame_count').value) || 100;
-    const priority = document.getElementById('priority').checked;
-    const multiplier = priority ? 1.5 : 1.0;
-    
-    const total = basePrice * frameCount * multiplier;
-    
+    // Update displays
+    document.getElementById('base-price-display').textContent = `$${(basePrice * frameCount).toFixed(2)}`;
     document.getElementById('multiplier-display').textContent = multiplier + 'x';
     document.getElementById('total-estimate').textContent = '$' + total.toFixed(2);
 }
 
-// Enhanced form submission
-document.addEventListener('DOMContentLoaded', function() {
-    const orderForm = document.querySelector('.order-form');
-    if (orderForm) {
-        orderForm.addEventListener('submit', async function(e) {
-            e.preventDefault();
-            
-            // Collect form data
-            const formData = {
-                email: document.getElementById('email').value,
-                project_link: document.getElementById('project_link').value,
-                bargain: document.getElementById('bargain').checked,
-                priority: document.getElementById('priority').checked,
-                notes: document.getElementById('notes').value,
-                frame_count: document.getElementById('frame_count').value,
-                service_type: 'Blender Rendering',
-                base_price: '{{ prices.blender_per_frame }}',
-                multiplier: document.getElementById('priority').checked ? '1.5x' : '1x',
-                estimated_total: document.getElementById('total-estimate').textContent
-            };
-            
-            // Show loading state
-            const submitButton = document.querySelector('.submit-button');
-            const originalText = submitButton.innerHTML;
-            submitButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Sending Order...';
-            submitButton.disabled = true;
-            
-            try {
-                // Submit via API
-                const response = await fetch('/api/order', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify(formData)
-                });
-                
-                const data = await response.json();
-                
-                if (data.success) {
-                    // Also submit the regular form for server-side processing
-                    orderForm.submit();
-                } else {
-                    alert('Order submitted but Discord notification failed. Your order is still saved.');
-                    orderForm.submit();
-                }
-            } catch (error) {
-                console.error('Error:', error);
-                alert('There was an error submitting your order. Please try again.');
-                submitButton.innerHTML = originalText;
-                submitButton.disabled = false;
-            }
-        });
-    }
+// Form submission handler
+function handleFormSubmit() {
+    const btn = document.getElementById('submit-btn');
+    const originalText = btn.innerHTML;
     
-    // Update price on load
+    // Show loading state
+    btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Processing...';
+    btn.disabled = true;
+    
+    // Allow form to submit normally
+    return true;
+}
+
+// Initialize price estimate
+document.addEventListener('DOMContentLoaded', function() {
     updatePriceEstimate();
 });
 </script>
+
+<style>
+/* Additional styles for order page */
+.order-content {
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    gap: 2rem;
+    margin-top: 2rem;
+}
+
+@media (max-width: 992px) {
+    .order-content {
+        grid-template-columns: 1fr;
+    }
+}
+
+.order-form-container {
+    background: var(--card-bg);
+    padding: 2rem;
+    border-radius: 8px;
+    border: 1px solid var(--border-color);
+}
+
+.order-info {
+    background: var(--card-bg);
+    padding: 2rem;
+    border-radius: 8px;
+    border: 1px solid var(--border-color);
+    height: fit-content;
+}
+
+.info-steps {
+    list-style: none;
+    counter-reset: step-counter;
+    padding-left: 0;
+}
+
+.info-steps li {
+    counter-increment: step-counter;
+    margin-bottom: 1rem;
+    padding-left: 2rem;
+    position: relative;
+}
+
+.info-steps li:before {
+    content: counter(step-counter);
+    position: absolute;
+    left: 0;
+    top: 0;
+    background: var(--accent-primary);
+    color: white;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.75rem;
+    font-weight: bold;
+}
+
+.development-notice {
+    background: var(--warning);
+    color: #212529;
+    padding: 1rem;
+    border-radius: 6px;
+    display: flex;
+    gap: 1rem;
+    align-items: flex-start;
+    border: 1px solid rgba(0,0,0,0.1);
+}
+
+.development-notice i {
+    font-size: 1.2rem;
+    margin-top: 0.2rem;
+}
+
+.form-text {
+    display: block;
+    margin-top: 0.25rem;
+    color: var(--text-secondary);
+    font-size: 0.875rem;
+}
+
+.toggle-label {
+    font-weight: 500;
+    color: var(--text-primary);
+    cursor: pointer;
+}
+
+/* Fix toggle switch sizing */
+.toggle-switch {
+    position: relative;
+    width: 50px;
+    height: 26px;
+    flex-shrink: 0;
+}
+
+.toggle-switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.toggle-slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: var(--toggle-bg);
+    border-radius: 34px;
+    border: 2px solid var(--toggle-border);
+    transition: .4s;
+}
+
+.toggle-slider:before {
+    position: absolute;
+    content: "";
+    height: 18px;
+    width: 18px;
+    left: 2px;
+    bottom: 2px;
+    background: var(--toggle-handle);
+    border-radius: 50%;
+    transition: .4s;
+}
+
+.toggle-switch input:checked + .toggle-slider {
+    background: var(--accent-primary);
+    border-color: var(--accent-primary);
+}
+
+.toggle-switch input:checked + .toggle-slider:before {
+    transform: translateX(24px);
+}
+
+.toggle-small {
+    width: 50px;
+    height: 26px;
+}
+
+.toggle-small .toggle-slider:before {
+    height: 18px;
+    width: 18px;
+    left: 2px;
+    bottom: 2px;
+}
+</style>
 {% endblock %}
