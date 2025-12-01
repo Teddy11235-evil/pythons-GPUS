@@ -1,4 +1,4 @@
-blender_per_frame: $0.04
+blender_per_frame: $0.03
 hash_per_minute: $0.05
 tensorflow_base: $0.10
 priority_multiplier: 1.5x
