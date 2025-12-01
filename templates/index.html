@@ -1,187 +1,207 @@
 {% extends "base.html" %}
 
+{% block title %}Home - Python's GPUs{% endblock %}
+
 {% block content %}
+    <!-- Hero Section -->
     <section class="hero">
         <div class="container">
-            <div class="gpu-animation">
-                <i class="fas fa-microchip"></i>
+            <div class="hero-icon">
+                <i class="fas fa-server"></i>
             </div>
-            <div class="status-badge">
-                <span class="pulse-dot"></span>
-                <span id="status-message">Loading services...</span>
-            </div>
-            <h1>Python's GPU Services</h1>
-            <p class="subtitle">
-                Specialized GPU compute services for Blender rendering, TensorFlow tasks, and hash cracking.
-                <span class="warning-text">⚠️ All services are currently under development</span>
+            <h1>GPU Compute Services</h1>
+            <p class="hero-subtitle">
+                Rent GPU power for Blender rendering, machine learning, and compute tasks.
+                Simple pricing, no setup required.
             </p>
-            <a href="#services" class="cta-button">View Services & Pricing</a>
+            
+            <div class="service-tags" style="justify-content: center; margin-bottom: 2rem;">
+                <span class="tag dev-tag">Under Development</span>
+                <span class="tag work-tag">Active Development</span>
+            </div>
+            
+            <div class="hero-cta">
+                <a href="/blender-order" class="btn btn-primary">
+                    <i class="fas fa-play-circle"></i> Start Rendering
+                </a>
+                <a href="#services" class="btn btn-secondary">
+                    <i class="fas fa-list"></i> View Services
+                </a>
+            </div>
         </div>
     </section>
 
+    <!-- Stats -->
     <section class="stats">
         <div class="container">
-            <div class="stat-card">
-                <div class="stat-number">5</div>
-                <p>Projects Completed</p>
-            </div>
-            <div class="stat-card">
-                <div class="stat-number" id="blender-price">{{ prices.blender_per_frame }}</div>
-                <p>Per Frame (Blender)</p>
-            </div>
-            <div class="stat-card">
-                <div class="stat-number" id="hash-price">{{ prices.hash_per_minute }}</div>
-                <p>Per Minute (Hash)</p>
-            </div>
-            <div class="stat-card">
-                <div class="stat-number" id="priority-multiplier">{{ prices.priority_multiplier }}</div>
-                <p>Priority Multiplier</p>
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-number">5+</div>
+                    <div class="stat-label">Projects Completed</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number">{{ prices.blender_per_frame }}</div>
+                    <div class="stat-label">Per Frame</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number">{{ prices.hash_per_minute }}</div>
+                    <div class="stat-label">Per Minute (Hash)</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number">24/7</div>
+                    <div class="stat-label">Queue Monitoring</div>
+                </div>
             </div>
         </div>
     </section>
 
+    <!-- Services -->
     <section class="services" id="services">
         <div class="container">
-            <h2 class="section-title">Our Specialized Services</h2>
+            <h2 class="section-title">Available Services</h2>
             <div class="services-grid">
-                <!-- Blender Rendering -->
+                <!-- Blender -->
                 <div class="service-card">
                     <div class="service-tags">
-                        <span class="tag development-tag">Under Development</span>
-                        <span class="tag working-tag">Being Worked On</span>
+                        <span class="tag dev-tag">Under Dev</span>
+                        <span class="tag work-tag">Priority</span>
                     </div>
                     <div class="service-icon">
                         <i class="fas fa-cube"></i>
                     </div>
                     <h3>Blender Rendering</h3>
-                    <p class="price" id="dynamic-blender-price">{{ prices.blender_per_frame }} per frame</p>
-                    <ul class="features">
-                        <li>GPU-accelerated Cycles rendering</li>
+                    <p class="service-description">
+                        GPU-accelerated 3D rendering with Blender Cycles engine.
+                    </p>
+                    <div class="service-price">{{ prices.blender_per_frame }} / frame</div>
+                    <ul class="service-features">
                         <li>Blender 3.0+ support</li>
                         <li>Complex scene handling</li>
                         <li>Fast frame delivery</li>
+                        <li>Priority queue available</li>
                     </ul>
-                    <a href="/blender-order" class="cta-button">Order Render Job</a>
+                    <a href="/blender-order" class="btn btn-primary btn-full">
+                        <i class="fas fa-shopping-cart"></i> Order Render
+                    </a>
                 </div>
 
-                <!-- TensorFlow GPU -->
+                <!-- TensorFlow -->
                 <div class="service-card">
                     <div class="service-tags">
-                        <span class="tag development-tag">Under Development</span>
+                        <span class="tag dev-tag">Under Dev</span>
                     </div>
                     <div class="service-icon">
                         <i class="fas fa-brain"></i>
                     </div>
                     <h3>TensorFlow Compute</h3>
-                    <p class="price" id="dynamic-tf-price">From {{ prices.tensorflow_base }}/min</p>
-                    <ul class="features">
-                        <li>TensorFlow GPU acceleration</li>
-                        <li>Custom Python environments</li>
+                    <p class="service-description">
+                        GPU-accelerated machine learning with TensorFlow.
+                    </p>
+                    <div class="service-price">From {{ prices.tensorflow_base }} / min</div>
+                    <ul class="service-features">
+                        <li>TensorFlow 2.x support</li>
+                        <li>Custom environments</li>
                         <li>Model training & inference</li>
                         <li>Real-time monitoring</li>
                     </ul>
-                    <button class="cta-button" onclick="showComingSoon('tensorflow')">Coming Soon</button>
+                    <button class="btn btn-secondary btn-full" onclick="alert('Coming Soon!')">
+                        <i class="fas fa-clock"></i> Coming Soon
+                    </button>
                 </div>
 
                 <!-- Hash Cracking -->
                 <div class="service-card">
                     <div class="service-tags">
-                        <span class="tag development-tag">Under Development</span>
+                        <span class="tag dev-tag">Under Dev</span>
                     </div>
                     <div class="service-icon">
                         <i class="fas fa-lock"></i>
                     </div>
                     <h3>Hash Cracking</h3>
-                    <p class="price" id="dynamic-hash-price">{{ prices.hash_per_minute }} per minute</p>
-                    <ul class="features">
-                        <li>GPU-accelerated cracking</li>
+                    <p class="service-description">
+                        GPU-accelerated hash cracking for security testing.
+                    </p>
+                    <div class="service-price">{{ prices.hash_per_minute }} / minute</div>
+                    <ul class="service-features">
                         <li>Multiple hash types</li>
-                        <li>Custom wordlist support</li>
-                        <li>Fast results delivery</li>
+                        <li>Custom wordlists</li>
+                        <li>High-speed cracking</li>
+                        <li>Secure processing</li>
                     </ul>
-                    <button class="cta-button" onclick="showComingSoon('hashcracking')">Coming Soon</button>
-                </div>
-
-                <!-- Hosting (Unavailable) -->
-                <div class="service-card unavailable">
-                    <div class="service-tags">
-                        <span class="tag development-tag">Under Development</span>
-                    </div>
-                    <div class="service-icon">
-                        <i class="fas fa-server"></i>
-                    </div>
-                    <h3>Hosting Services</h3>
-                    <p class="price">Not Available</p>
-                    <ul class="features">
-                        <li>GPU server hosting</li>
-                        <li>Dedicated resources</li>
-                        <li>24/7 uptime</li>
-                        <li>Managed services</li>
-                    </ul>
-                    <button class="cta-button" disabled>Notify Me</button>
+                    <button class="btn btn-secondary btn-full" onclick="alert('Coming Soon!')">
+                        <i class="fas fa-clock"></i> Coming Soon
+                    </button>
                 </div>
             </div>
         </div>
     </section>
 
-    <!-- How It Works Section -->
+    <!-- How It Works -->
     <section class="how-it-works">
         <div class="container">
             <h2 class="section-title">How It Works</h2>
-            <div class="steps-grid">
-                <div class="step-card">
+            <div class="steps">
+                <div class="step">
                     <div class="step-number">1</div>
-                    <h3>Submit Your Task</h3>
-                    <p>Upload your Blender file, Python script, or hash file through our simple interface.</p>
+                    <h3>Submit Your Project</h3>
+                    <p>Upload your Blender file or provide project details through our order form.</p>
                 </div>
-                <div class="step-card">
+                <div class="step">
                     <div class="step-number">2</div>
                     <h3>We Process It</h3>
-                    <p>Our GPU servers process your task with real-time monitoring and updates.</p>
+                    <p>Our GPU servers process your task with real-time progress updates.</p>
                 </div>
-                <div class="step-card">
+                <div class="step">
                     <div class="step-number">3</div>
-                    <h3>Get Results</h3>
-                    <p>Download your rendered frames, model outputs, or cracked hashes immediately.</p>
+                    <h3>Receive Results</h3>
+                    <p>Download your rendered frames or processed results immediately.</p>
                 </div>
             </div>
         </div>
     </section>
 
-    <!-- The Rock Meme Section -->
+    <!-- The Rock -->
     <section class="rock-section">
-        <div class="container">
-            <div class="rock-meme">
-                <div class="rock">
-                    <div class="rock-face">🗿</div>
-                    <div class="rock-speech">"Your IP: <span id="user-ip">Loading...</span><br>
-                    Ping: <span id="server-ping">--</span>ms<br>
-                    Users online: <span id="online-users">{{ user_count }}</span></div>
-                </div>
-                <div class="rock-caption">
-                    <p>The Ancient Server Stone knows all...</p>
-                </div>
+        <div class="container rock-container">
+            <div class="rock-face">🗿</div>
+            <div class="rock-speech">
+                <strong>Server Stone Status:</strong><br>
+                IP: <span id="user-ip">Loading...</span><br>
+                Ping: <span id="server-ping">--</span>ms<br>
+                Users: <span id="online-users">{{ user_count }}</span> online
             </div>
+            <p class="rock-caption">The Ancient Server Stone watches over your compute tasks...</p>
         </div>
     </section>
+{% endblock %}
 
-    <!-- Coming Soon Modal -->
-    <div id="comingSoonModal" class="modal">
-        <div class="modal-content">
-            <span class="close-modal" onclick="closeModal('comingSoonModal')">&times;</span>
-            <div class="coming-soon-content">
-                <i class="fas fa-tools"></i>
-                <h2>Service Under Development</h2>
-                <p id="modal-service-name">This service is currently being developed and will be available soon.</p>
-                <p>We're working hard to bring you the best GPU compute experience!</p>
-                <div class="progress-container">
-                    <div class="progress-bar">
-                        <div class="progress-fill" id="progress-fill"></div>
-                    </div>
-                    <div class="progress-text">Development in progress...</div>
-                </div>
-                <button class="cta-button" onclick="closeModal('comingSoonModal')">Got It!</button>
-            </div>
-        </div>
-    </div>
+{% block scripts %}
+<script>
+// Update rock info
+async function updateRockInfo() {
+    try {
+        const response = await fetch('/api/status');
+        const data = await response.json();
+        
+        document.getElementById('online-count').textContent = data.user_count;
+        document.getElementById('online-users').textContent = data.user_count;
+        document.getElementById('server-ping').textContent = data.server_ping;
+        
+        // Generate fake IP for demo
+        const ipElement = document.getElementById('user-ip');
+        if (ipElement.textContent === 'Loading...') {
+            ipElement.textContent = `192.168.${Math.floor(Math.random() * 255)}.${Math.floor(Math.random() * 255)}`;
+        }
+    } catch (error) {
+        console.log('Failed to update status:', error);
+    }
+}
+
+// Update rock info every 10 seconds
+setInterval(updateRockInfo, 10000);
+updateRockInfo();
+
+// Update server status
+document.getElementById('server-status').textContent = '🟢 Online';
+</script>
 {% endblock %}
