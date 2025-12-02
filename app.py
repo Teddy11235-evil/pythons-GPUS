@@ -43,14 +43,20 @@ class CacheManager:
 
 cache = CacheManager(ttl=300)
 
-# ===== DISCORD FUNCTIONS (same as before) =====
+# ===== DISCORD WEBHOOK FUNCTIONS =====
 def send_discord_async(content, username="Python's GPUS Bot"):
+    """Send message to Discord in background thread"""
     def send():
         try:
-            payload = {"content": content, "username": username}
-            requests.post(DISCORD_WEBHOOK_URL, json=payload, timeout=5)
-        except:
-            pass
+            payload = {
+                "content": content,
+                "username": username,
+                "avatar_url": "https://cdn-icons-png.flaticon.com/512/3094/3094067.png"
+            }
+            response = requests.post(DISCORD_WEBHOOK_URL, json=payload, timeout=5)
+            print(f"[Discord] Response: {response.status_code}")
+        except Exception as e:
+            print(f"[Discord] Async send error: {e}")
     
     thread = threading.Thread(target=send)
     thread.daemon = True
@@ -58,39 +64,84 @@ def send_discord_async(content, username="Python's GPUS Bot"):
     return thread
 
 def format_order_message(order_data):
+    """Format order data for Discord with proper boolean handling"""
+    # Debug the incoming data
+    print(f"[Format Debug] Order data received: {json.dumps(order_data, indent=2)}")
+    
+    # Get boolean values - handle different formats
+    bargain = order_data.get('bargain', False)
+    priority = order_data.get('priority', False)
+    
+    print(f"[Format Debug] Raw bargain: {bargain}, type: {type(bargain)}")
+    print(f"[Format Debug] Raw priority: {priority}, type: {type(priority)}")
+    
+    # Convert to boolean
+    def to_bool(value):
+        if isinstance(value, bool):
+            return value
+        if isinstance(value, str):
+            return value.lower() in ['true', 'on', 'yes', '1']
+        if isinstance(value, (int, float)):
+            return bool(value)
+        return False
+    
+    bargain_bool = to_bool(bargain)
+    priority_bool = to_bool(priority)
+    
+    print(f"[Format Debug] Processed bargain: {bargain_bool}")
+    print(f"[Format Debug] Processed priority: {priority_bool}")
+    
+    # Get and truncate notes
+    notes = order_data.get('notes', 'No additional notes')
+    if len(notes) > 400:
+        notes = notes[:397] + "..."
+    
+    # Get user agent and truncate
+    user_agent = order_data.get('user_agent', 'Unknown')
+    if len(user_agent) > 100:
+        user_agent = user_agent[:97] + "..."
+    
+    # Format the message
     return f"""```yaml
 📦 NEW ORDER RECEIVED
 ════════════════════════════════════════
 📧 Contact Email: {order_data.get('email', 'Not provided')}
 ⏰ Timestamp: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}
+🆔 Order ID: {order_data.get('id', f"TEMP-{int(time.time())}")}
 
-🛒 Order Details:
+🛒 ORDER DETAILS:
 ────────────────────────────────────────
 • Service Type: {order_data.get('service_type', 'Blender Rendering')}
 • Project Link: {order_data.get('project_link', 'Not provided')}
 • Estimated Frames: {order_data.get('frame_count', 'Not specified')}
-• Bargain Requested: {'✅ Yes' if order_data.get('bargain') else '❌ No'}
-• High Priority: {'✅ Yes (1.5x price)' if order_data.get('priority') else '❌ No'}
-• Notes: {order_data.get('notes', 'No additional notes')}
-
-💰 Price Estimate:
-────────────────────────────────────────
+• Bargain Requested: {'✅ YES' if bargain_bool else '❌ NO'}
+• High Priority: {'✅ YES (1.5x price)' if priority_bool else '❌ NO'}
 • Base Price/Frame: {order_data.get('base_price', '$0.04')}
 • Priority Multiplier: {order_data.get('multiplier', '1x')}
 • Estimated Total: {order_data.get('estimated_total', 'Not calculated')}
 
-🌐 Website Info:
+📝 ADDITIONAL NOTES ({len(notes)} chars):
+────────────────────────────────────────
+{notes}
+
+🌐 CLIENT INFORMATION:
 ────────────────────────────────────────
 • IP Address: {order_data.get('user_ip', 'Not recorded')}
-• User Agent: {order_data.get('user_agent', 'Unknown')[:50]}...
+• User Agent: {user_agent}
+• Referrer: {order_data.get('referrer', 'Direct visit')}
 
-⚠️ Status: UNDER DEVELOPMENT
+⚠️ SERVICE STATUS: UNDER DEVELOPMENT
 ════════════════════════════════════════
-This is a pre-order request. Service is in development.
+This is a pre-order request. Service is currently in development.
+The customer will be contacted when the service becomes available.
 ```"""
 
 def notify_new_order(order_data):
+    """Send order notification to Discord"""
     message = format_order_message(order_data)
+    print(f"[Notify] Sending to Discord: {order_data.get('email')}")
+    print(f"[Notify] Bargain: {order_data.get('bargain')}")
+    print(f"[Notify] Priority: {order_data.get('priority')}")
     send_discord_async(message, "🎉 New Order")
     return True
 
@@ -149,11 +200,8 @@ def home():
 
 @app.route('/toggle-dark-mode', methods=['POST'])
 def toggle_dark_mode():
-    """Toggle dark mode preference"""
     data = request.get_json()
     dark_mode = data.get('dark_mode', False)
-    # In production, you'd save this to a database or session
-    # For now, we'll just acknowledge it
     return jsonify({'success': True, 'dark_mode': dark_mode})
 
 @app.route('/about')
@@ -167,26 +215,46 @@ def blender_order():
         prices = get_prices()
         return render_template('blender_order.html', prices=prices)
     
-    # POST request
+    # POST request - process order
     try:
+        # Get form data - IMPORTANT: checkboxes only appear in form when checked!
         email = request.form.get('email', '').strip()
         project_link = request.form.get('project_link', '').strip()
-        bargain = request.form.get('bargain') == 'on'
-        priority = request.form.get('priority') == 'on'
+        
+        # Checkboxes: if present in form, they are checked. If not present, they are unchecked.
+        bargain = 'bargain' in request.form
+        priority = 'priority' in request.form
+        
         notes = request.form.get('notes', '').strip()
         frame_count = request.form.get('frame_count', '100')
         
+        # Debug output
+        print(f"\n=== FORM DATA RECEIVED ===")
+        print(f"All form keys: {list(request.form.keys())}")
+        print(f"Email: {email}")
+        print(f"Bargain key in form: {'bargain' in request.form}")
+        print(f"Priority key in form: {'priority' in request.form}")
+        print(f"Notes length: {len(notes)}")
+        print(f"Frame count: {frame_count}")
+        print("=========================\n")
+        
+        # Calculate price
         prices = get_prices()
         base_price = float(prices['blender_per_frame'].replace('$', ''))
         multiplier = 1.5 if priority else 1.0
         estimated_total = f"${base_price * int(frame_count) * multiplier:.2f}"
         
+        # Truncate notes to 400 characters for Discord
+        discord_notes = notes[:400] if len(notes) > 400 else notes
+        
+        # Prepare order data
         order_data = {
             'email': email,
             'project_link': project_link,
-            'bargain': bargain,
-            'priority': priority,
-            'notes': notes,
+            'bargain': bargain,  # This is now a proper boolean
+            'priority': priority,  # This is now a proper boolean
+            'notes': discord_notes,
+            'original_notes': notes,
             'frame_count': frame_count,
             'service_type': 'Blender Rendering',
             'base_price': prices['blender_per_frame'],
@@ -194,22 +262,30 @@ def blender_order():
             'estimated_total': estimated_total,
             'user_ip': request.headers.get('X-Forwarded-For', request.remote_addr),
             'user_agent': request.headers.get('User-Agent', 'Unknown')[:100],
+            'referrer': request.headers.get('Referer', 'Direct'),
             'timestamp': datetime.now().isoformat()
         }
         
+        # Send to Discord (async)
         notify_new_order(order_data)
         
+        # Save locally (non-blocking) with full notes
+        order_data['notes'] = notes  # Restore full notes for local storage
         thread = threading.Thread(target=save_order_locally, args=(order_data,))
         thread.daemon = True
         thread.start()
         
+        # Redirect to confirmation
         return redirect(url_for('order_confirmation', service='blender'))
         
     except Exception as e:
-        print(f"Order error: {e}")
+        print(f"Order processing error: {e}")
+        import traceback
+        traceback.print_exc()
         return redirect(url_for('blender_order'))
 
 def save_order_locally(order_data):
+    """Save order to JSON file (background task)"""
     try:
         orders_file = 'orders.json'
         orders = []
@@ -224,14 +300,19 @@ def save_order_locally(order_data):
         order_data['id'] = f"ORD-{int(time.time())}"
         orders.append(order_data)
         
+        # Keep only last 100 orders
         if len(orders) > 100:
             orders = orders[-100:]
         
         with open(orders_file, 'w') as f:
-            json.dump(orders, f, indent=2)
+            json.dump(orders, f, indent=2, default=str)
             
+        print(f"[Order Saved] ID: {order_data['id']}, Email: {order_data['email']}")
+        print(f"[Order Saved] Bargain: {order_data.get('bargain')}")
+        print(f"[Order Saved] Priority: {order_data.get('priority')}")
+        
     except Exception as e:
-        print(f"Save error: {e}")
+        print(f"[Save Error] Failed to save order: {e}")
 
 @app.route('/order-confirmation/<service>')
 def order_confirmation(service):
@@ -239,22 +320,45 @@ def order_confirmation(service):
 
 @app.route('/api/order', methods=['POST'])
 def api_order():
+    """API endpoint for external order submissions"""
     if request.method != 'POST':
         return jsonify({'error': 'Method not allowed'}), 405
     
     try:
         data = request.get_json()
         if not data:
-            return jsonify({'error': 'No JSON data'}), 400
+            return jsonify({'error': 'No JSON data provided'}), 400
         
+        # Process boolean values
+        bargain = data.get('bargain', False)
+        priority = data.get('priority', False)
+        
+        # Convert string values to boolean
+        if isinstance(bargain, str):
+            bargain = bargain.lower() in ['true', 'on', 'yes', '1']
+        if isinstance(priority, str):
+            priority = priority.lower() in ['true', 'on', 'yes', '1']
+        
+        # Truncate notes
+        notes = data.get('notes', '')
+        if len(notes) > 400:
+            notes = notes[:397] + "..."
+        
+        # Add metadata
         data.update({
             'user_ip': request.headers.get('X-Forwarded-For', request.remote_addr),
             'user_agent': request.headers.get('User-Agent', 'Unknown'),
             'timestamp': datetime.now().isoformat(),
-            'source': 'api'
+            'source': 'api',
+            'bargain': bargain,
+            'priority': priority,
+            'notes': notes
         })
         
+        # Send to Discord
         notify_new_order(data)
+        
+        # Save locally
         save_order_locally(data)
         
         return jsonify({
@@ -264,6 +368,7 @@ def api_order():
         })
         
     except Exception as e:
+        print(f"[API Error] {e}")
         return jsonify({'error': str(e)}), 500
 
 @app.route('/api/prices')
@@ -277,27 +382,69 @@ def api_status():
         'status': 'online',
         'timestamp': datetime.now().isoformat(),
         'service': 'pythons-gpus-store',
-        'version': '1.4.0'
+        'version': '1.6.0',
+        'discord_webhook': 'active'
     })
 
 @app.route('/webhook/test')
 def test_webhook():
-    test_message = f"""```yaml
-✅ WEBHOOK TEST
-════════════════════════════════════════
-• Service: Python's GPUS Server
-• Time: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}
-• Status: ✅ Operational
-════════════════════════════════════════
-```"""
+    """Test Discord webhook with sample data"""
+    test_data = {
+        'email': 'test@example.com',
+        'project_link': 'https://example.com/test.blend',
+        'bargain': True,
+        'priority': True,
+        'notes': 'This is a test order with bargain and priority enabled. ' * 10,
+        'frame_count': '50',
+        'service_type': 'Blender Rendering',
+        'base_price': '$0.04',
+        'multiplier': '1.5x',
+        'estimated_total': '$3.00',
+        'user_ip': '192.168.1.100',
+        'user_agent': 'Mozilla/5.0 Test Browser',
+        'referrer': 'Test Page'
+    }
     
-    send_discord_async(test_message, "🔄 Test Bot")
-    return jsonify({'success': True, 'message': 'Test sent'})
+    message = format_order_message(test_data)
+    send_discord_async(message, "🔄 Test Order")
+    
+    return jsonify({
+        'success': True,
+        'message': 'Test order sent to Discord',
+        'test_data': test_data
+    })
+
+@app.route('/webhook/debug')
+def debug_webhook():
+    """Debug endpoint to check webhook configuration"""
+    return jsonify({
+        'webhook_url': DISCORD_WEBHOOK_URL[:50] + '...' if DISCORD_WEBHOOK_URL else 'Not set',
+        'status': 'Configured' if DISCORD_WEBHOOK_URL else 'Not configured',
+        'test_endpoint': '/webhook/test'
+    })
 
 @app.route('/health')
 def health():
     return jsonify({'status': 'healthy', 'timestamp': datetime.now().isoformat()})
 
+@app.route('/orders/debug', methods=['GET'])
+def debug_orders():
+    """Debug endpoint to see recent orders"""
+    try:
+        if os.path.exists('orders.json'):
+            with open('orders.json', 'r') as f:
+                orders = json.load(f)
+            recent = orders[-5:] if len(orders) > 5 else orders
+            return jsonify({
+                'total_orders': len(orders),
+                'recent_orders': recent
+            })
+        else:
+            return jsonify({'total_orders': 0, 'recent_orders': []})
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+# ===== ERROR HANDLERS =====
 @app.errorhandler(404)
 def not_found(e):
     return render_template('404.html'), 404
@@ -312,6 +459,22 @@ def server_error(e):
 ```"""
     send_discord_async(error_msg, "🚨 Error Alert")
     return render_template('500.html', error=str(e)), 500
+
+# ===== STARTUP =====
+@app.before_first_request
+def startup_tasks():
+    """Run once on startup"""
+    startup_msg = f"""```yaml
+🚀 SERVER STARTED
+════════════════════════════════════════
+• Service: Python's GPUS Store v1.6.0
+• Time: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}
+• Environment: {'Production' if os.environ.get('RENDER') else 'Development'}
+• Discord Webhook: {'✅ Active' if DISCORD_WEBHOOK_URL else '❌ Inactive'}
+════════════════════════════════════════
+```"""
+    send_discord_async(startup_msg, "🚀 Server Startup")
+    print("[Startup] Server initialized with Discord webhook support")
 
 if __name__ == '__main__':
     port = int(os.environ.get('PORT', 5000))
