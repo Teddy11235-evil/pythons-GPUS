@@ -18,14 +18,18 @@
             <div class="service-tags" style="justify-content: center; margin-bottom: 2rem;">
                 <span class="tag live-tag">✅ Rendering Ready</span>
                 <span class="tag secure-tag">🔒 Secure Payments</span>
+                <span class="tag hash-tag">🔐 Hash Crack Ready</span>
             </div>
             
             <div class="hero-cta">
                 <a href="/blender-order" class="btn btn-primary">
-                    <i class="fas fa-play-circle"></i> Start Rendering
+                    <i class="fas fa-cube"></i> Blender Render
+                </a>
+                <a href="/hashcrack-order" class="btn btn-primary">
+                    <i class="fas fa-key"></i> Hash Crack
                 </a>
                 <a href="#services" class="btn btn-secondary">
-                    <i class="fas fa-list"></i> View Services
+                    <i class="fas fa-list"></i> View All Services
                 </a>
             </div>
         </div>
@@ -84,6 +88,31 @@
                     </a>
                 </div>
 
+                <!-- Hash Cracking -->
+                <div class="service-card">
+                    <div class="service-tags">
+                        <span class="tag ready-tag">✅ Ready Now</span>
+                        <span class="tag secure-tag">🔒 Secure</span>
+                    </div>
+                    <div class="service-icon">
+                        <i class="fas fa-lock"></i>
+                    </div>
+                    <h3>Hash Cracking</h3>
+                    <p class="service-description">
+                        GPU-accelerated hash cracking for security testing and password recovery.
+                    </p>
+                    <div class="service-price">{{ prices.hash_per_minute }} / minute</div>
+                    <ul class="service-features">
+                        <li>Multiple hash types (MD5, SHA, NTLM, bcrypt)</li>
+                        <li>Eco/Standard/High-speed options</li>
+                        <li>Custom wordlists available</li>
+                        <li>Secure data handling</li>
+                    </ul>
+                    <a href="/hashcrack-order" class="btn btn-primary btn-full">
+                        <i class="fas fa-shopping-cart"></i> Order Hash Crack
+                    </a>
+                </div>
+
                 <!-- TensorFlow -->
                 <div class="service-card">
                     <div class="service-tags">
@@ -107,30 +136,6 @@
                         <i class="fas fa-clock"></i> Coming Soon
                     </button>
                 </div>
-
-                <!-- Hash Cracking -->
-                <div class="service-card">
-                    <div class="service-tags">
-                        <span class="tag dev-tag">Under Dev</span>
-                    </div>
-                    <div class="service-icon">
-                        <i class="fas fa-lock"></i>
-                    </div>
-                    <h3>Hash Cracking</h3>
-                    <p class="service-description">
-                        GPU-accelerated hash cracking for security testing.
-                    </p>
-                    <div class="service-price">{{ prices.hash_per_minute }} / minute</div>
-                    <ul class="service-features">
-                        <li>Multiple hash types</li>
-                        <li>Custom wordlists</li>
-                        <li>High-speed cracking</li>
-                        <li>Secure processing</li>
-                    </ul>
-                    <button class="btn btn-secondary btn-full" onclick="showComingSoonModal('Hash Cracking')">
-                        <i class="fas fa-clock"></i> Coming Soon
-                    </button>
-                </div>
             </div>
         </div>
     </section>
@@ -143,22 +148,22 @@
                 <div class="step">
                     <div class="step-number">1</div>
                     <h3>Submit Your Request</h3>
-                    <p>Fill out our order form with your project details, email, and requirements. Make sure to include all necessary information about your Blender project.</p>
+                    <p>Fill out our order form with your project details, email, and requirements. Include all necessary information about your project.</p>
                 </div>
                 <div class="step">
                     <div class="step-number">2</div>
                     <h3>Review & Confirmation</h3>
-                    <p>We review your request within 48 hours and inform you that we've started rendering. Feel free to ask any questions about progress or requirements.</p>
+                    <p>We review your request within 48 hours and inform you that we've started processing. Feel free to ask any questions.</p>
                 </div>
                 <div class="step">
                     <div class="step-number">3</div>
-                    <h3>Watermarked Proof</h3>
-                    <p>We send you the finished render with a prominent watermark as proof of work. Review the quality and confirm it meets your expectations.</p>
+                    <h3>Payment & Processing</h3>
+                    <p>Make payment via PayPal, Bitcoin, or Monero. We start processing immediately after payment confirmation.</p>
                 </div>
                 <div class="step">
                     <div class="step-number">4</div>
-                    <h3>Payment & Delivery</h3>
-                    <p>Make payment via PayPal. Once confirmed, we send you the final render without watermark. We're available for questions throughout the process.</p>
+                    <h3>Results Delivery</h3>
+                    <p>Receive your results via secure link. We're available for questions throughout the process.</p>
                 </div>
             </div>
             
@@ -169,7 +174,7 @@
                 </div>
                 <div class="note-content">
                     <h4>Communication & Questions</h4>
-                    <p>Buyers may ask any questions regarding progress, technical details, or requirements at any stage. We provide updates and are available to discuss your project throughout the rendering process.</p>
+                    <p>Buyers may ask any questions regarding progress, technical details, or requirements at any stage. We provide updates and are available to discuss your project throughout the processing.</p>
                 </div>
             </div>
         </div>
@@ -425,6 +430,44 @@ function showComingSoonModal(serviceName) {
     margin: 0;
 }
 
+/* Hash Crack Tag */
+.tag.hash-tag {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    border: 1px solid #764ba2;
+}
+
+.tag.ready-tag {
+    background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+    color: white;
+    border: 1px solid #059669;
+}
+
+/* Hero CTA Updates */
+.hero-cta {
+    display: flex;
+    gap: 1rem;
+    justify-content: center;
+    flex-wrap: wrap;
+    margin-top: 2rem;
+}
+
+.btn-primary {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.75rem 1.5rem;
+    border-radius: 8px;
+    font-weight: 600;
+    text-decoration: none;
+    transition: all 0.2s ease;
+}
+
+.btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(13, 110, 253, 0.2);
+}
+
 /* Responsive adjustments */
 @media (max-width: 768px) {
     .steps {
@@ -439,6 +482,18 @@ function showComingSoonModal(serviceName) {
     
     .note-icon {
         margin: 0 auto;
+    }
+    
+    .hero-cta {
+        flex-direction: column;
+        align-items: center;
+    }
+    
+    .btn-primary, .btn-secondary {
+        width: 100%;
+        max-width: 250px;
+        text-align: center;
+        justify-content: center;
     }
 }
 </style>
