@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{% block title %}Python's GPUs - GPU Compute Services{% endblock %}</title>
+    <title>{% block title %}BagelCompute - GPU Compute Services{% endblock %}</title>
     
     <!-- Styles -->
     <link rel="stylesheet" href="/static/style.css">
@@ -33,8 +33,11 @@
                     <a href="/about" class="{% if request.path == '/about' %}active{% endif %}">
                         <i class="fas fa-info-circle"></i> About
                     </a>
-                    <a href="/blender-order">
-                        <i class="fas fa-cube"></i> Order Render
+                    <a href="/blender-order" class="{% if request.path == '/blender-order' %}active{% endif %}">
+                        <i class="fas fa-cube"></i> Blender Render
+                    </a>
+                    <a href="/hashcrack-order" class="{% if request.path == '/hashcrack-order' %}active{% endif %}">
+                        <i class="fas fa-key"></i> Hash Crack
                     </a>
                     
                     <!-- Dark Mode Toggle -->
@@ -70,8 +73,8 @@
                 <div class="footer-section">
                     <h3>Services</h3>
                     <a href="/blender-order">Blender Rendering</a>
+                    <a href="/hashcrack-order">Hash Cracking</a>
                     <a href="#">TensorFlow Compute</a>
-                    <a href="#">Hash Cracking</a>
                 </div>
                 
                 <div class="footer-section">
@@ -79,6 +82,7 @@
                     <a href="/">Home</a>
                     <a href="/about">About</a>
                     <a href="/blender-order">Order Form</a>
+                    <a href="/hashcrack-order">Hash Crack</a>
                 </div>
                 
                 <div class="footer-section">
