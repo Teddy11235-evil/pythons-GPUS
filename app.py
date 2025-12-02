@@ -148,6 +148,48 @@ def format_order_message(order_data):
 This is a pre-order request. Service is currently in development.
 The customer will be contacted when the service becomes available.
 ```"""
+def format_hashcrack_message(order_data):
+    """Format hash cracking order data for Discord"""
+    # Get and truncate notes
+    notes = order_data.get('notes', 'No additional notes')
+    if len(notes) > 400:
+        notes = notes[:397] + "..."
+    
+    # Format the message
+    return f"""```yaml
+🔐 NEW HASH CRACKING ORDER
+════════════════════════════════════════
+📧 Contact Email: {order_data.get('email', 'Not provided')}
+⏰ Timestamp: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}
+🆔 Order ID: {order_data.get('id', f"HASH-{int(time.time())}")}
+
+🛒 ORDER DETAILS:
+────────────────────────────────────────
+• Service Type: Hash Cracking
+• Hash Type: {order_data.get('hash_type', 'Not specified')}
+• Hash Preview: {order_data.get('hash_preview', 'Not provided')}
+• Hash Length: {order_data.get('hash_length', 0)} characters
+• Duration: {order_data.get('duration', '60 minutes')}
+• Device: {order_data.get('device', 'standard').upper()}
+• Device Multiplier: {order_data.get('device_multiplier', '1x')}
+• Base Price/Minute: {order_data.get('base_price', '$0.05')}
+• Estimated Total: {order_data.get('estimated_total', 'Not calculated')}
+
+📝 ADDITIONAL NOTES ({len(notes)} chars):
+────────────────────────────────────────
+{notes}
+
+🌐 CLIENT INFORMATION:
+────────────────────────────────────────
+• IP Address: {order_data.get('user_ip', 'Not recorded')}
+• User Agent: {order_data.get('user_agent', 'Unknown')[:100]}
+• Referrer: {order_data.get('referrer', 'Direct visit')}
+
+⚠️ SERVICE STATUS: READY NOW
+════════════════════════════════════════
+This hash cracking order is ready for processing.
+Customer will be contacted for payment details.
+```"""
 
 def notify_new_order(order_data):
     """Send order notification to Discord"""
