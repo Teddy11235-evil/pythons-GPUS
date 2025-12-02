@@ -10,6 +10,11 @@ import threading
 
 app = Flask(__name__)
 
+# ====== VERIFICATION =======
+@app.route('/google3d6f7d99b69b603c.html')
+def google_verify():
+    return app.send_static_file('google3d6f7d99b69b603c.html')
+
 # ===== CONFIGURATION =====
 DISCORD_WEBHOOK_URL = "https://discord.com/api/webhooks/1445098227815944192/9RuBPnQoe6wYDmtqnDHpf7PB401_lS9BfNKkCeYT4DhQyRCc4HUaRep8tiPqE594rLpI"
 ABOUT_FILE_URL = "https://raw.githubusercontent.com/Teddy11235-evil/pythons-GPUS/main/about.txt"
