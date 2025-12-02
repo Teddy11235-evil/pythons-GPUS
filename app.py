@@ -154,6 +154,13 @@ def notify_new_order(order_data):
     send_discord_async(message, "🎉 New Order")
     return True
 
+def notify_hashcrack_order(order_data):
+    """Send hash cracking order notification to Discord"""
+    message = format_hashcrack_message(order_data)
+    print(f"[HashCrack Notify] Sending order for: {order_data.get('email')}")
+    send_discord_async(message, "🔐 New Hash Crack Order")
+    return True
+
 # ===== GITHUB FETCHING =====
 @lru_cache(maxsize=2)
 def fetch_github_content(url):
@@ -223,6 +230,92 @@ def blender_order():
     if request.method == 'GET':
         prices = get_prices()
         return render_template('blender_order.html', prices=prices)
+
+@app.route('/hashcrack-order', methods=['GET', 'POST'])
+def hashcrack_order():
+    if request.method == 'GET':
+        return render_template('hashcrack_order.html')
+    
+    # POST request - process hash cracking order
+    try:
+        # Get form data
+        email = request.form.get('email', '').strip()
+        hash_type = request.form.get('hash_type', '').strip()
+        hash_value = request.form.get('hash', '').strip()
+        duration = request.form.get('duration', '60').strip()
+        device = request.form.get('device', 'standard').strip()
+        notes = request.form.get('notes', '').strip()
+        
+        # Debug output
+        print(f"\n=== HASH CRACKING ORDER DATA ===")
+        print(f"Email: {email}")
+        print(f"Hash Type: {hash_type}")
+        print(f"Hash: {hash_value[:20]}...")
+        print(f"Duration: {duration} minutes")
+        print(f"Device: {device}")
+        print(f"Notes length: {len(notes)}")
+        print("=================================\n")
+        
+        # Validate inputs
+        if not all([email, hash_type, hash_value, duration]):
+            return jsonify({'error': 'Missing required fields'}), 400
+        
+        # Calculate price
+        prices = get_prices()
+        base_price = float(prices.get('hash_per_minute', '$0.05').replace('$', ''))
+        
+        # Device multipliers
+        device_multipliers = {
+            'eco': 0.1,
+            'standard': 1.0,
+            'highspeed': 4.0
+        }
+        multiplier = device_multipliers.get(device, 1.0)
+        
+        duration_int = int(duration)
+        base_total = base_price * duration_int
+        estimated_total = f"${base_total * multiplier:.2f}"
+        
+        # Truncate notes for Discord
+        discord_notes = notes[:400] if len(notes) > 400 else notes
+        
+        # Prepare order data
+        order_data = {
+            'email': email,
+            'hash_type': hash_type,
+            'hash_preview': f"{hash_value[:20]}...{hash_value[-10:]}" if len(hash_value) > 30 else hash_value,
+            'hash_length': len(hash_value),
+            'duration': f"{duration} minutes",
+            'device': device,
+            'device_multiplier': f"{multiplier}x",
+            'notes': discord_notes,
+            'original_notes': notes,
+            'service_type': 'Hash Cracking',
+            'base_price': prices.get('hash_per_minute', '$0.05'),
+            'estimated_total': estimated_total,
+            'user_ip': request.headers.get('X-Forwarded-For', request.remote_addr),
+            'user_agent': request.headers.get('User-Agent', 'Unknown')[:100],
+            'referrer': request.headers.get('Referer', 'Direct'),
+            'timestamp': datetime.now().isoformat()
+        }
+        
+        # Send to Discord with hash-specific formatting
+        notify_hashcrack_order(order_data)
+        
+        # Save locally with full notes
+        order_data['notes'] = notes  # Restore full notes for local storage
+        thread = threading.Thread(target=save_order_locally, args=(order_data,))
+        thread.daemon = True
+        thread.start()
+        
+        # Redirect to confirmation
+        return redirect(url_for('order_confirmation', service='hashcrack'))
+        
+    except Exception as e:
+        print(f"Hash cracking order error: {e}")
+        import traceback
+        traceback.print_exc()
+        return redirect(url_for('hashcrack_order'))
     
     # POST request - process order
     try:
