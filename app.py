@@ -461,10 +461,15 @@ def server_error(e):
     return render_template('500.html', error=str(e)), 500
 
 # ===== STARTUP =====
-@app.before_first_request
+# Flag to track if startup has run
+_startup_has_run = False
+
+@app.before_request
 def startup_tasks():
     """Run once on startup"""
-    startup_msg = f"""```yaml
+    global _startup_has_run
+    if not _startup_has_run:
+        startup_msg = f"""```yaml
 🚀 SERVER STARTED
 ════════════════════════════════════════
 • Service: Python's GPUS Store v1.6.0
@@ -473,8 +478,9 @@ def startup_tasks():
 • Discord Webhook: {'✅ Active' if DISCORD_WEBHOOK_URL else '❌ Inactive'}
 ════════════════════════════════════════
 ```"""
-    send_discord_async(startup_msg, "🚀 Server Startup")
-    print("[Startup] Server initialized with Discord webhook support")
+        send_discord_async(startup_msg, "🚀 Server Startup")
+        print("[Startup] Server initialized with Discord webhook support")
+        _startup_has_run = True
 
 if __name__ == '__main__':
     port = int(os.environ.get('PORT', 5000))
