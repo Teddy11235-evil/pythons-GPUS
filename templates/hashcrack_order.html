@@ -1,0 +1,1127 @@
+{% extends "base.html" %}
+
+{% block title %}Order Hash Cracking - Python's GPUs{% endblock %}
+
+{% block head %}
+<style>
+/* Professional Order Page Styles */
+.order-page {
+    min-height: calc(100vh - 200px);
+    padding: 3rem 0;
+    background: var(--bg-secondary);
+}
+
+.order-header-section {
+    text-align: center;
+    margin-bottom: 3rem;
+    padding-bottom: 2rem;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.order-header-section h1 {
+    font-size: 2.5rem;
+    font-weight: 700;
+    margin-bottom: 1rem;
+    color: var(--text-primary);
+}
+
+.order-subtitle {
+    color: var(--text-secondary);
+    font-size: 1.1rem;
+    max-width: 700px;
+    margin: 0 auto;
+    line-height: 1.6;
+}
+
+.order-grid {
+    display: grid;
+    grid-template-columns: 1fr 400px;
+    gap: 3rem;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+@media (max-width: 992px) {
+    .order-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* Order Form Card */
+.order-form-card {
+    background: var(--card-bg);
+    border-radius: 12px;
+    padding: 2.5rem;
+    border: 1px solid var(--border-color);
+    box-shadow: 0 4px 20px var(--shadow-color);
+}
+
+.form-section {
+    margin-bottom: 2.5rem;
+    padding-bottom: 2rem;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.form-section:last-child {
+    border-bottom: none;
+    margin-bottom: 0;
+    padding-bottom: 0;
+}
+
+.section-title {
+    font-size: 1.25rem;
+    font-weight: 600;
+    margin-bottom: 1.5rem;
+    color: var(--text-primary);
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.section-title i {
+    color: var(--accent-primary);
+}
+
+.form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.5rem;
+    margin-bottom: 1.5rem;
+}
+
+@media (max-width: 768px) {
+    .form-row {
+        grid-template-columns: 1fr;
+    }
+}
+
+.form-group {
+    margin-bottom: 1.5rem;
+}
+
+.form-label {
+    display: block;
+    margin-bottom: 0.5rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    font-size: 0.95rem;
+}
+
+.form-label .required {
+    color: var(--danger);
+    margin-left: 2px;
+}
+
+.form-control {
+    width: 100%;
+    padding: 0.875rem 1rem;
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    background: var(--bg-primary);
+    color: var(--text-primary);
+    font-size: 0.95rem;
+    transition: all 0.2s ease;
+    font-family: 'SF Mono', monospace;
+}
+
+.form-control:focus {
+    outline: none;
+    border-color: var(--accent-primary);
+    box-shadow: 0 0 0 3px rgba(13, 110, 253, 0.1);
+}
+
+.form-control::placeholder {
+    color: var(--text-muted);
+}
+
+textarea.form-control {
+    min-height: 120px;
+    resize: vertical;
+    line-height: 1.5;
+    font-family: 'SF Mono', monospace;
+}
+
+/* Device Selection */
+.device-options {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1rem;
+    margin-top: 1rem;
+}
+
+.device-option {
+    border: 2px solid var(--border-color);
+    border-radius: 8px;
+    padding: 1.5rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    text-align: center;
+    background: var(--bg-primary);
+}
+
+.device-option:hover {
+    border-color: var(--accent-primary);
+    transform: translateY(-2px);
+}
+
+.device-option.selected {
+    border-color: var(--accent-primary);
+    background: rgba(13, 110, 253, 0.05);
+}
+
+.device-icon {
+    font-size: 2rem;
+    margin-bottom: 0.75rem;
+    color: var(--accent-primary);
+}
+
+.device-name {
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+    color: var(--text-primary);
+}
+
+.device-price {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: var(--accent-primary);
+    margin-bottom: 0.5rem;
+    font-family: 'SF Mono', monospace;
+}
+
+.device-description {
+    font-size: 0.875rem;
+    color: var(--text-secondary);
+    line-height: 1.4;
+}
+
+/* Hash Input */
+.hash-input-group {
+    position: relative;
+}
+
+.hash-format {
+    position: absolute;
+    right: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--text-muted);
+    font-size: 0.875rem;
+    background: var(--bg-primary);
+    padding: 0 0.5rem;
+}
+
+/* Hash Type Select */
+.hash-type-select {
+    width: 100%;
+    padding: 0.875rem 1rem;
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    background: var(--bg-primary);
+    color: var(--text-primary);
+    font-size: 0.95rem;
+    font-family: 'SF Mono', monospace;
+}
+
+/* Price Summary */
+.price-summary-card {
+    background: var(--card-bg);
+    border-radius: 12px;
+    padding: 2rem;
+    border: 1px solid var(--border-color);
+    box-shadow: 0 4px 20px var(--shadow-color);
+    position: sticky;
+    top: 2rem;
+}
+
+.price-header {
+    text-align: center;
+    margin-bottom: 2rem;
+    padding-bottom: 1.5rem;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.price-header h3 {
+    font-size: 1.5rem;
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+    color: var(--text-primary);
+}
+
+.price-details {
+    margin-bottom: 2rem;
+}
+
+.price-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.75rem 0;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.price-label {
+    color: var(--text-secondary);
+    font-size: 0.95rem;
+}
+
+.price-value {
+    font-weight: 600;
+    color: var(--text-primary);
+    font-family: 'SF Mono', monospace;
+}
+
+.price-total {
+    margin-top: 1.5rem;
+    padding-top: 1.5rem;
+    border-top: 2px solid var(--accent-primary);
+}
+
+.total-label {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: var(--text-primary);
+}
+
+.total-value {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--accent-primary);
+    font-family: 'SF Mono', monospace;
+}
+
+.price-note {
+    text-align: center;
+    font-size: 0.875rem;
+    color: var(--text-secondary);
+    margin-top: 1rem;
+    line-height: 1.4;
+}
+
+/* Order Summary */
+.order-summary {
+    background: var(--bg-tertiary);
+    padding: 1.5rem;
+    border-radius: 8px;
+    margin-top: 2rem;
+    border: 1px solid var(--border-color);
+}
+
+.summary-title {
+    font-size: 1.1rem;
+    font-weight: 600;
+    margin-bottom: 1rem;
+    color: var(--text-primary);
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.summary-list {
+    list-style: none;
+    padding-left: 0;
+}
+
+.summary-list li {
+    padding: 0.5rem 0;
+    color: var(--text-secondary);
+    display: flex;
+    align-items: flex-start;
+    gap: 0.75rem;
+    font-size: 0.95rem;
+}
+
+.summary-list li i {
+    color: var(--accent-primary);
+    margin-top: 0.2rem;
+    flex-shrink: 0;
+}
+
+/* Submit Button */
+.submit-section {
+    text-align: center;
+    margin-top: 3rem;
+}
+
+.submit-btn {
+    padding: 1rem 3rem;
+    font-size: 1.1rem;
+    font-weight: 600;
+    border-radius: 8px;
+    background: var(--accent-primary);
+    color: white;
+    border: none;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.75rem;
+    min-width: 250px;
+    justify-content: center;
+}
+
+.submit-btn:hover {
+    background: var(--accent-secondary);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(13, 110, 253, 0.2);
+}
+
+.submit-btn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    transform: none !important;
+}
+
+/* Payment Information */
+.payment-info-box {
+    background: var(--card-bg);
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    padding: 1.5rem;
+    margin: 2rem 0;
+    border-left: 4px solid var(--success);
+}
+
+.payment-header {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 1rem;
+}
+
+.payment-header i {
+    color: var(--success);
+    font-size: 1.5rem;
+}
+
+.payment-header h4 {
+    color: var(--text-primary);
+    margin: 0;
+}
+
+.payment-details ul {
+    list-style: none;
+    padding-left: 0;
+    margin: 1rem 0;
+}
+
+.payment-details li {
+    padding: 0.5rem 0;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    color: var(--text-secondary);
+}
+
+.payment-details li i {
+    width: 20px;
+    text-align: center;
+}
+
+.payment-details li .fa-paypal {
+    color: #003087;
+}
+
+.payment-details li .fa-bitcoin {
+    color: #f7931a;
+}
+
+.payment-details li .fa-coins {
+    color: #f26822;
+}
+
+/* Form Validation */
+.form-control.error {
+    border-color: var(--danger);
+}
+
+.error-message {
+    color: var(--danger);
+    font-size: 0.875rem;
+    margin-top: 0.25rem;
+    display: none;
+}
+
+.form-control.error + .error-message {
+    display: block;
+}
+
+/* Notes Counter */
+.notes-counter {
+    text-align: right;
+    margin-top: 0.5rem;
+    font-size: 0.875rem;
+    color: var(--text-secondary);
+}
+
+.notes-counter .warning {
+    color: var(--warning);
+    font-weight: bold;
+}
+
+.notes-counter .limit {
+    color: var(--danger);
+    font-weight: bold;
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="order-page">
+    <div class="container">
+        <!-- Header -->
+        <div class="order-header-section">
+            <h1>Hash Cracking Order</h1>
+            <p class="order-subtitle">
+                Professional GPU-accelerated hash cracking service. We support multiple hash types with different speed options.
+                Perfect for security testing, password recovery, and forensic analysis.
+            </p>
+            <div class="service-tags" style="justify-content: center; margin-top: 1.5rem;">
+                <span class="tag live-tag">✅ Ready Now</span>
+                <span class="tag secure-tag">🔒 Secure Processing</span>
+            </div>
+        </div>
+
+        <div class="order-grid">
+            <!-- Left Column: Order Form -->
+            <div class="order-form-card">
+                <!-- Contact Details -->
+                <div class="form-section">
+                    <h3 class="section-title">
+                        <i class="fas fa-envelope"></i>
+                        Contact Details
+                    </h3>
+                    
+                    <div class="form-group">
+                        <label for="email" class="form-label">
+                            Email Address <span class="required">*</span>
+                        </label>
+                        <input type="email" id="email" name="email" class="form-control" 
+                               required placeholder="name@company.com">
+                        <div class="error-message">Please enter a valid email address</div>
+                    </div>
+                </div>
+
+                <!-- Hash Details -->
+                <div class="form-section">
+                    <h3 class="section-title">
+                        <i class="fas fa-lock"></i>
+                        Hash Details
+                    </h3>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="hash_type" class="form-label">
+                                Hash Type <span class="required">*</span>
+                            </label>
+                            <select id="hash_type" name="hash_type" class="hash-type-select" required onchange="updatePriceSummary()">
+                                <option value="">Select hash type...</option>
+                                <option value="md5">MD5</option>
+                                <option value="sha1">SHA-1</option>
+                                <option value="sha256">SHA-256</option>
+                                <option value="sha512">SHA-512</option>
+                                <option value="ntlm">NTLM</option>
+                                <option value="bcrypt">bcrypt</option>
+                                <option value="argon2">Argon2</option>
+                                <option value="other">Other (specify in notes)</option>
+                            </select>
+                            <div class="error-message">Please select a hash type</div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="duration" class="form-label">
+                                Duration (minutes) <span class="required">*</span>
+                            </label>
+                            <input type="number" id="duration" name="duration" class="form-control"
+                                   min="1" max="1440" value="60" required onchange="updatePriceSummary()">
+                            <small class="form-text" style="display: block; margin-top: 0.5rem; color: var(--text-secondary);">
+                                How long to run the cracking (1-1440 minutes = 24 hours max)
+                            </small>
+                            <div class="error-message">Please enter duration (1-1440 minutes)</div>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="hash" class="form-label">
+                            Hash to Crack <span class="required">*</span>
+                        </label>
+                        <div class="hash-input-group">
+                            <input type="text" id="hash" name="hash" class="form-control"
+                                   required placeholder="e9d71f5ee7c92d6dc9e92ffdad17b8bd49418f98">
+                            <span class="hash-format">hex</span>
+                        </div>
+                        <small class="form-text" style="display: block; margin-top: 0.5rem; color: var(--text-secondary);">
+                            Enter the hash value in hexadecimal format
+                        </small>
+                        <div class="error-message">Please enter a valid hash</div>
+                    </div>
+                </div>
+
+                <!-- Device Selection -->
+                <div class="form-section">
+                    <h3 class="section-title">
+                        <i class="fas fa-microchip"></i>
+                        GPU Device Selection
+                    </h3>
+                    
+                    <div class="device-options">
+                        <!-- Eco Option -->
+                        <div class="device-option" data-device="eco" onclick="selectDevice('eco')">
+                            <div class="device-icon">
+                                <i class="fas fa-leaf"></i>
+                            </div>
+                            <div class="device-name">Eco Mode</div>
+                            <div class="device-price">×0.1 Price</div>
+                            <div class="device-description">
+                                Slow but cost-effective. Perfect for non-urgent tasks or when budget is limited.
+                            </div>
+                        </div>
+                        
+                        <!-- Standard Option -->
+                        <div class="device-option selected" data-device="standard" onclick="selectDevice('standard')">
+                            <div class="device-icon">
+                                <i class="fas fa-balance-scale"></i>
+                            </div>
+                            <div class="device-name">Standard GPU</div>
+                            <div class="device-price">×1.0 Price</div>
+                            <div class="device-description">
+                                Balanced speed and price. Our most popular option for general hash cracking.
+                            </div>
+                        </div>
+                        
+                        <!-- High Speed Option -->
+                        <div class="device-option" data-device="highspeed" onclick="selectDevice('highspeed')">
+                            <div class="device-icon">
+                                <i class="fas fa-bolt"></i>
+                            </div>
+                            <div class="device-name">High Speed</div>
+                            <div class="device-price">×4.0 Price</div>
+                            <div class="device-description">
+                                Maximum performance. 4x faster than standard. For urgent tasks and complex hashes.
+                            </div>
+                        </div>
+                    </div>
+                    <input type="hidden" id="device" name="device" value="standard">
+                </div>
+
+                <!-- Additional Information -->
+                <div class="form-section">
+                    <h3 class="section-title">
+                        <i class="fas fa-info-circle"></i>
+                        Additional Information
+                    </h3>
+                    
+                    <div class="form-group">
+                        <label for="notes" class="form-label">
+                            Project Notes & Requirements
+                        </label>
+                        <textarea id="notes" name="notes" class="form-control" rows="4"
+                                  placeholder="Please include:&#10;• Wordlist preferences&#10;• Known password patterns&#10;• Specific requirements&#10;• Any additional context"></textarea>
+                        <small class="form-text" style="display: block; margin-top: 0.5rem; color: var(--text-secondary);">
+                            Detailed information helps us provide better service and faster results.
+                        </small>
+                        <div class="notes-counter">
+                            <span id="notes-count">0</span>/400 characters
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Payment Information -->
+                <div class="payment-info-box">
+                    <div class="payment-header">
+                        <i class="fas fa-shield-alt"></i>
+                        <h4>Secure Payment Process</h4>
+                    </div>
+                    <div class="payment-details">
+                        <p><strong>Accepted Payment Methods:</strong></p>
+                        <ul>
+                            <li><i class="fab fa-paypal"></i> <strong>PayPal</strong> - Standard payment processing</li>
+                            <li><i class="fab fa-bitcoin"></i> <strong>Bitcoin (BTC)</strong> - 5% discount, direct transfer</li>
+                            <li><i class="fas fa-coins"></i> <strong>Monero (XMR)</strong> - 5% discount, privacy-focused</li>
+                        </ul>
+                        <p><strong>Process:</strong> We start cracking immediately after payment. Results delivered as soon as found or at end of duration.</p>
+                        <p><strong>Crypto Discount:</strong> Pay with Bitcoin or Monero to receive a <strong>5% discount</strong> on your total order.</p>
+                    </div>
+                </div>
+
+                <!-- Submit Section -->
+                <div class="submit-section">
+                    <form method="POST" id="order-form" onsubmit="return handleOrderSubmission(event)">
+                        <button type="submit" class="submit-btn" id="submit-btn">
+                            <i class="fas fa-paper-plane"></i>
+                            Submit Hash Cracking Order
+                        </button>
+                        <p class="price-note" style="margin-top: 1rem;">
+                            Payment required before processing. Results delivered within selected duration.
+                        </p>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Right Column: Price Summary -->
+            <div class="price-summary-card">
+                <div class="price-header">
+                    <h3>Price Estimate</h3>
+                    <p style="color: var(--text-secondary); font-size: 0.95rem;">
+                        Based on current selections
+                    </p>
+                </div>
+                
+                <div class="price-details">
+                    <div class="price-row">
+                        <span class="price-label">Base Price (per minute)</span>
+                        <span class="price-value">$0.05</span>
+                    </div>
+                    
+                    <div class="price-row">
+                        <span class="price-label">Duration</span>
+                        <span class="price-value" id="duration-display">60 minutes</span>
+                    </div>
+                    
+                    <div class="price-row">
+                        <span class="price-label">Device Multiplier</span>
+                        <span class="price-value" id="multiplier-display">1.0x</span>
+                    </div>
+                    
+                    <div class="price-row">
+                        <span class="price-label">Subtotal</span>
+                        <span class="price-value" id="subtotal-display">$3.00</span>
+                    </div>
+                    
+                    <div class="price-row price-total">
+                        <span class="total-label">Estimated Total</span>
+                        <span class="total-value" id="total-estimate">$3.00</span>
+                    </div>
+                </div>
+                
+                <p class="price-note">
+                    * Prices are estimates. Complex hash types may require additional time.
+                    No guarantee of successful cracking - payment is for processing time.
+                </p>
+                
+                <!-- Order Summary -->
+                <div class="order-summary">
+                    <h4 class="summary-title">
+                        <i class="fas fa-clipboard-check"></i>
+                        What's Included
+                    </h4>
+                    <ul class="summary-list">
+                        <li>
+                            <i class="fas fa-check-circle"></i>
+                            <span>GPU-accelerated hash cracking</span>
+                        </li>
+                        <li>
+                            <i class="fas fa-check-circle"></i>
+                            <span>Support for multiple hash types</span>
+                        </li>
+                        <li>
+                            <i class="fas fa-check-circle"></i>
+                            <span>Custom wordlist generation</span>
+                        </li>
+                        <li>
+                            <i class="fas fa-check-circle"></i>
+                            <span>Secure data handling</span>
+                        </li>
+                        <li>
+                            <i class="fas fa-check-circle"></i>
+                            <span>Results delivered via secure link</span>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+// ===== GLOBAL VARIABLES =====
+const BASE_PRICE_PER_MINUTE = 0.05;
+let formDraft = {
+    email: '',
+    hash_type: '',
+    hash: '',
+    duration: '60',
+    device: 'standard',
+    notes: ''
+};
+
+// ===== INITIALIZATION =====
+document.addEventListener('DOMContentLoaded', function() {
+    console.log('Hash Cracking Order Page Loaded');
+    
+    // Initialize components
+    updatePriceSummary();
+    setupFormValidation();
+    setupNotesCounter();
+    loadDraft();
+    setupAutoSave();
+    
+    // Set up device selection
+    setupDeviceSelection();
+});
+
+// ===== DEVICE SELECTION =====
+function setupDeviceSelection() {
+    // Click handlers are set via onclick in HTML
+}
+
+function selectDevice(deviceType) {
+    // Remove selected class from all devices
+    document.querySelectorAll('.device-option').forEach(option => {
+        option.classList.remove('selected');
+    });
+    
+    // Add selected class to clicked device
+    const selectedOption = document.querySelector(`.device-option[data-device="${deviceType}"]`);
+    if (selectedOption) {
+        selectedOption.classList.add('selected');
+    }
+    
+    // Update hidden input
+    document.getElementById('device').value = deviceType;
+    formDraft.device = deviceType;
+    
+    // Update price summary
+    updatePriceSummary();
+    
+    // Save draft
+    saveDraft();
+}
+
+// ===== PRICE CALCULATION =====
+function updatePriceSummary() {
+    try {
+        const duration = parseInt(document.getElementById('duration').value) || 60;
+        const device = document.getElementById('device').value;
+        
+        // Validate duration
+        if (duration < 1) {
+            document.getElementById('duration').value = 1;
+            return updatePriceSummary();
+        }
+        if (duration > 1440) {
+            document.getElementById('duration').value = 1440;
+            return updatePriceSummary();
+        }
+        
+        // Get device multiplier
+        let multiplier;
+        switch(device) {
+            case 'eco':
+                multiplier = 0.1;
+                break;
+            case 'highspeed':
+                multiplier = 4.0;
+                break;
+            default: // standard
+                multiplier = 1.0;
+        }
+        
+        // Calculate prices
+        const baseTotal = BASE_PRICE_PER_MINUTE * duration;
+        const total = baseTotal * multiplier;
+        
+        // Update displays with animation
+        updateWithAnimation('duration-display', duration + ' minutes');
+        updateWithAnimation('multiplier-display', multiplier.toFixed(1) + 'x');
+        updateWithAnimation('subtotal-display', '$' + baseTotal.toFixed(2));
+        updateWithAnimation('total-estimate', '$' + total.toFixed(2));
+        
+        // Update form draft
+        formDraft.duration = duration.toString();
+        
+    } catch (error) {
+        console.error('Error in updatePriceSummary:', error);
+    }
+}
+
+function updateWithAnimation(elementId, newValue) {
+    const element = document.getElementById(elementId);
+    if (element) {
+        element.classList.remove('updated');
+        void element.offsetWidth; // Trigger reflow
+        element.textContent = newValue;
+        element.classList.add('updated');
+    }
+}
+
+// ===== FORM VALIDATION =====
+function setupFormValidation() {
+    const formControls = document.querySelectorAll('.form-control[required], .hash-type-select[required]');
+    
+    formControls.forEach(control => {
+        control.addEventListener('blur', function() {
+            validateField(this);
+        });
+        
+        control.addEventListener('input', function() {
+            if (this.classList.contains('error')) {
+                validateField(this);
+            }
+        });
+        
+        if (control.tagName === 'SELECT') {
+            control.addEventListener('change', function() {
+                validateField(this);
+            });
+        }
+    });
+}
+
+function validateField(field) {
+    const errorMessage = field.nextElementSibling?.nextElementSibling || field.nextElementSibling;
+    
+    // Clear any existing error
+    field.classList.remove('error');
+    if (errorMessage && errorMessage.classList.contains('error-message')) {
+        errorMessage.style.display = 'none';
+    }
+    
+    let isValid = true;
+    let errorText = '';
+    
+    switch(field.type) {
+        case 'email':
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            if (!emailRegex.test(field.value.trim())) {
+                isValid = false;
+                errorText = 'Please enter a valid email address';
+            }
+            break;
+            
+        case 'number':
+            const value = parseInt(field.value);
+            if (isNaN(value) || value < 1 || value > 1440) {
+                isValid = false;
+                errorText = 'Please enter duration between 1 and 1440 minutes';
+            }
+            break;
+            
+        case 'text':
+            if (field.id === 'hash') {
+                const hashValue = field.value.trim();
+                // Basic hash validation - check if it looks like hex
+                const hexRegex = /^[0-9a-fA-F]+$/;
+                if (!hashValue || !hexRegex.test(hashValue)) {
+                    isValid = false;
+                    errorText = 'Please enter a valid hexadecimal hash';
+                }
+            }
+            break;
+    }
+    
+    // Select validation
+    if (field.tagName === 'SELECT' && !field.value) {
+        isValid = false;
+        errorText = 'Please select a hash type';
+    }
+    
+    if (!isValid) {
+        field.classList.add('error');
+        if (errorMessage && errorMessage.classList.contains('error-message')) {
+            errorMessage.textContent = errorText;
+            errorMessage.style.display = 'block';
+        }
+    }
+    
+    return isValid;
+}
+
+function validateForm() {
+    const requiredFields = document.querySelectorAll('.form-control[required], .hash-type-select[required]');
+    let isValid = true;
+    
+    requiredFields.forEach(field => {
+        if (!validateField(field)) {
+            isValid = false;
+        }
+    });
+    
+    return isValid;
+}
+
+// ===== NOTES COUNTER =====
+function setupNotesCounter() {
+    const notesTextarea = document.getElementById('notes');
+    const notesCount = document.getElementById('notes-count');
+    
+    if (notesTextarea && notesCount) {
+        // Initial count
+        notesCount.textContent = notesTextarea.value.length;
+        
+        // Update on input
+        notesTextarea.addEventListener('input', function() {
+            const length = this.value.length;
+            notesCount.textContent = length;
+            
+            // Warn if approaching limit
+            if (length > 350) {
+                notesCount.className = 'warning';
+            } else if (length > 300) {
+                notesCount.className = 'warning';
+            } else {
+                notesCount.className = '';
+            }
+            
+            // Update draft
+            formDraft.notes = this.value;
+        });
+    }
+}
+
+// ===== FORM SUBMISSION =====
+async function handleOrderSubmission(event) {
+    event.preventDefault();
+    console.log('Form submission started');
+    
+    // Validate form
+    if (!validateForm()) {
+        alert('Please fix the errors in the form before submitting.');
+        return false;
+    }
+    
+    // Show loading state
+    const submitBtn = document.getElementById('submit-btn');
+    const originalText = submitBtn.innerHTML;
+    const originalDisabled = submitBtn.disabled;
+    
+    submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Processing Order...';
+    submitBtn.disabled = true;
+    
+    try {
+        // Get form element
+        const form = document.getElementById('order-form');
+        
+        // Create FormData
+        const formData = new FormData(form);
+        
+        // Debug: Log what's being sent
+        console.log('=== HASH CRACKING ORDER DATA ===');
+        for (let [key, value] of formData.entries()) {
+            console.log(`${key}: ${value} (${typeof value})`);
+        }
+        console.log('================================');
+        
+        // Submit form - you'll need to create this route in app.py
+        const response = await fetch('/hashcrack-order', {
+            method: 'POST',
+            body: formData
+        });
+        
+        if (response.redirected) {
+            // Clear draft on successful submission
+            localStorage.removeItem('hashcrackOrderDraft');
+            console.log('Redirecting to:', response.url);
+            window.location.href = response.url;
+        } else {
+            const text = await response.text();
+            console.error('Submission failed. Response:', text);
+            throw new Error('Submission failed with status: ' + response.status);
+        }
+        
+    } catch (error) {
+        console.error('Submission error:', error);
+        
+        // Restore button state
+        submitBtn.innerHTML = originalText;
+        submitBtn.disabled = originalDisabled;
+        
+        // Show error message
+        alert('There was an error submitting your order. Please try again.\n\nError: ' + error.message);
+        
+        return false;
+    }
+    
+    return false;
+}
+
+// ===== DRAFT SAVE/RESTORE =====
+function loadDraft() {
+    try {
+        const saved = localStorage.getItem('hashcrackOrderDraft');
+        if (saved) {
+            const data = JSON.parse(saved);
+            console.log('Loading draft:', data);
+            
+            // Restore form values
+            if (data.email) document.getElementById('email').value = data.email;
+            if (data.hash_type) document.getElementById('hash_type').value = data.hash_type;
+            if (data.hash) document.getElementById('hash').value = data.hash;
+            if (data.duration) document.getElementById('duration').value = data.duration;
+            if (data.notes) document.getElementById('notes').value = data.notes;
+            
+            // Restore device selection
+            if (data.device) {
+                selectDevice(data.device);
+            }
+            
+            // Update form draft object
+            Object.assign(formDraft, data);
+            
+            // Update UI
+            updatePriceSummary();
+            if (document.getElementById('notes-count')) {
+                document.getElementById('notes-count').textContent = data.notes?.length || 0;
+            }
+            
+            console.log('Draft loaded successfully');
+        }
+    } catch (error) {
+        console.error('Error loading draft:', error);
+        // Clear corrupted draft
+        localStorage.removeItem('hashcrackOrderDraft');
+    }
+}
+
+function saveDraft() {
+    try {
+        // Update form draft from current values
+        formDraft.email = document.getElementById('email').value;
+        formDraft.hash_type = document.getElementById('hash_type').value;
+        formDraft.hash = document.getElementById('hash').value;
+        formDraft.duration = document.getElementById('duration').value;
+        formDraft.device = document.getElementById('device').value;
+        formDraft.notes = document.getElementById('notes').value;
+        
+        // Save to localStorage
+        localStorage.setItem('hashcrackOrderDraft', JSON.stringify(formDraft));
+        
+        console.log('Draft saved:', formDraft);
+    } catch (error) {
+        console.error('Error saving draft:', error);
+    }
+}
+
+function setupAutoSave() {
+    // Save on input/change
+    const formInputs = document.querySelectorAll('#order-form input, #order-form textarea, #order-form select');
+    formInputs.forEach(input => {
+        input.addEventListener('input', saveDraft);
+        input.addEventListener('change', saveDraft);
+    });
+    
+    // Save on page unload
+    window.addEventListener('beforeunload', function() {
+        if (!document.getElementById('submit-btn').disabled) {
+            saveDraft();
+        }
+    });
+    
+    // Auto-save every 30 seconds
+    setInterval(saveDraft, 30000);
+}
+</script>
+
+<style>
+/* Animation for price updates */
+@keyframes priceUpdate {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.05); }
+    100% { transform: scale(1); }
+}
+
+.updated {
+    animation: priceUpdate 0.3s ease;
+}
+</style>
+{% endblock %}
