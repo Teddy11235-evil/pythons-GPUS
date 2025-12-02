@@ -48,8 +48,8 @@
                     <div class="stat-label">Per Minute (Hash)</div>
                 </div>
                 <div class="stat-card">
-                    <div class="stat-number">24/7</div>
-                    <div class="stat-label">Queue Monitoring</div>
+                    <div class="stat-number">48h</div>
+                    <div class="stat-label">Response Time</div>
                 </div>
             </div>
         </div>
@@ -104,7 +104,7 @@
                         <li>Model training & inference</li>
                         <li>Real-time monitoring</li>
                     </ul>
-                    <button class="btn btn-secondary btn-full" onclick="alert('Coming Soon!')">
+                    <button class="btn btn-secondary btn-full" onclick="showComingSoonModal('TensorFlow Compute')">
                         <i class="fas fa-clock"></i> Coming Soon
                     </button>
                 </div>
@@ -128,7 +128,7 @@
                         <li>High-speed cracking</li>
                         <li>Secure processing</li>
                     </ul>
-                    <button class="btn btn-secondary btn-full" onclick="alert('Coming Soon!')">
+                    <button class="btn btn-secondary btn-full" onclick="showComingSoonModal('Hash Cracking')">
                         <i class="fas fa-clock"></i> Coming Soon
                     </button>
                 </div>
@@ -143,18 +143,34 @@
             <div class="steps">
                 <div class="step">
                     <div class="step-number">1</div>
-                    <h3>Submit Your Project</h3>
-                    <p>Upload your Blender file or provide project details through our order form.</p>
+                    <h3>Submit Your Request</h3>
+                    <p>Fill out our order form with your project details, email, and requirements. Make sure to include all necessary information about your Blender project.</p>
                 </div>
                 <div class="step">
                     <div class="step-number">2</div>
-                    <h3>We Process It</h3>
-                    <p>Our GPU servers process your task with real-time progress updates.</p>
+                    <h3>Review & Confirmation</h3>
+                    <p>We review your request within 48 hours and inform you that we've started rendering. Feel free to ask any questions about progress or requirements.</p>
                 </div>
                 <div class="step">
                     <div class="step-number">3</div>
-                    <h3>Receive Results</h3>
-                    <p>Download your rendered frames or processed results immediately.</p>
+                    <h3>Watermarked Proof</h3>
+                    <p>We send you the finished render with a prominent watermark as proof of work. Review the quality and confirm it meets your expectations.</p>
+                </div>
+                <div class="step">
+                    <div class="step-number">4</div>
+                    <h3>Payment & Delivery</h3>
+                    <p>Make payment via PayPal. Once confirmed, we send you the final render without watermark. We're available for questions throughout the process.</p>
+                </div>
+            </div>
+            
+            <!-- Additional Note -->
+            <div class="process-note">
+                <div class="note-icon">
+                    <i class="fas fa-comments"></i>
+                </div>
+                <div class="note-content">
+                    <h4>Communication & Questions</h4>
+                    <p>Buyers may ask any questions regarding progress, technical details, or requirements at any stage. We provide updates and are available to discuss your project throughout the rendering process.</p>
                 </div>
             </div>
         </div>
@@ -203,5 +219,228 @@ updateRockInfo();
 
 // Update server status
 document.getElementById('server-status').textContent = '🟢 Online';
+
+// Coming Soon Modal
+function showComingSoonModal(serviceName) {
+    const modal = document.createElement('div');
+    modal.className = 'modal-overlay';
+    modal.innerHTML = `
+        <div class="modal">
+            <div class="modal-header">
+                <h3><i class="fas fa-tools"></i> Coming Soon</h3>
+                <button class="modal-close" onclick="this.closest('.modal-overlay').remove()">&times;</button>
+            </div>
+            <div class="modal-content">
+                <div class="coming-soon-icon">
+                    <i class="fas fa-cogs fa-3x"></i>
+                </div>
+                <h4>${serviceName} Service</h4>
+                <p>This service is currently under development and will be available soon.</p>
+                <p>We're working hard to bring you the best GPU compute experience!</p>
+                <div class="progress-indicator">
+                    <div class="progress-bar">
+                        <div class="progress-fill" style="width: 65%"></div>
+                    </div>
+                    <p class="progress-text">Development in progress...</p>
+                </div>
+                <button class="btn btn-primary" onclick="this.closest('.modal-overlay').remove()">
+                    Got It!
+                </button>
+            </div>
+        </div>
+    `;
+    
+    // Add styles if not already present
+    if (!document.getElementById('modal-styles')) {
+        const style = document.createElement('style');
+        style.id = 'modal-styles';
+        style.textContent = `
+            .modal-overlay {
+                position: fixed;
+                top: 0;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                background: rgba(0,0,0,0.5);
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                z-index: 9999;
+            }
+            .modal {
+                background: var(--card-bg);
+                border-radius: 12px;
+                width: 90%;
+                max-width: 500px;
+                border: 1px solid var(--border-color);
+                box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+            }
+            .modal-header {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                padding: 1.5rem;
+                border-bottom: 1px solid var(--border-color);
+            }
+            .modal-close {
+                background: none;
+                border: none;
+                font-size: 1.5rem;
+                cursor: pointer;
+                color: var(--text-secondary);
+            }
+            .modal-content {
+                padding: 2rem;
+                text-align: center;
+            }
+            .coming-soon-icon {
+                margin-bottom: 1.5rem;
+                color: var(--accent-primary);
+            }
+            .progress-indicator {
+                margin: 2rem 0;
+            }
+            .progress-bar {
+                height: 8px;
+                background: var(--bg-tertiary);
+                border-radius: 4px;
+                overflow: hidden;
+                margin-bottom: 0.5rem;
+            }
+            .progress-fill {
+                height: 100%;
+                background: linear-gradient(90deg, var(--accent-primary), var(--accent-secondary));
+                border-radius: 4px;
+                animation: progress-pulse 2s ease-in-out infinite;
+            }
+            @keyframes progress-pulse {
+                0%, 100% { width: 65%; }
+                50% { width: 70%; }
+            }
+            .progress-text {
+                font-size: 0.875rem;
+                color: var(--text-secondary);
+            }
+        `;
+        document.head.appendChild(style);
+    }
+    
+    document.body.appendChild(modal);
+}
 </script>
+
+<style>
+/* How It Works Updates */
+.how-it-works {
+    padding: 3rem 0;
+    background: var(--bg-primary);
+    border-top: 1px solid var(--border-color);
+}
+
+.steps {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 2rem;
+    margin-top: 2rem;
+    margin-bottom: 3rem;
+}
+
+.step {
+    text-align: center;
+    padding: 1.5rem;
+    background: var(--card-bg);
+    border-radius: 8px;
+    border: 1px solid var(--border-color);
+    box-shadow: 0 2px 8px var(--shadow-color);
+    transition: transform 0.2s ease;
+}
+
+.step:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 4px 12px var(--shadow-hover);
+}
+
+.step-number {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 50px;
+    height: 50px;
+    background: var(--accent-primary);
+    color: white;
+    border-radius: 50%;
+    font-size: 1.25rem;
+    font-weight: 700;
+    margin-bottom: 1rem;
+}
+
+.step h3 {
+    font-size: 1.2rem;
+    margin-bottom: 0.75rem;
+    color: var(--text-primary);
+}
+
+.step p {
+    color: var(--text-secondary);
+    line-height: 1.5;
+    font-size: 0.95rem;
+}
+
+/* Process Note */
+.process-note {
+    background: var(--bg-tertiary);
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    padding: 1.5rem;
+    margin-top: 2rem;
+    display: flex;
+    gap: 1.5rem;
+    align-items: flex-start;
+    max-width: 800px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.note-icon {
+    background: var(--accent-primary);
+    color: white;
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+    flex-shrink: 0;
+}
+
+.note-content h4 {
+    color: var(--text-primary);
+    margin-bottom: 0.5rem;
+    font-size: 1.1rem;
+}
+
+.note-content p {
+    color: var(--text-secondary);
+    line-height: 1.6;
+    margin: 0;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .steps {
+        grid-template-columns: 1fr;
+    }
+    
+    .process-note {
+        flex-direction: column;
+        text-align: center;
+        gap: 1rem;
+    }
+    
+    .note-icon {
+        margin: 0 auto;
+    }
+}
+</style>
 {% endblock %}
