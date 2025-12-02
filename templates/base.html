@@ -12,7 +12,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=SF+Mono&display=swap" rel="stylesheet">
     
-    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>💻</text></svg>">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🥯</text></svg>">
     
     {% block head %}{% endblock %}
 </head>
@@ -22,8 +22,11 @@
         <div class="container">
             <nav class="navbar">
                 <a href="/" class="logo">
-                    <i class="fas fa-microchip logo-icon"></i>
-                    <span>Python's GPUs</span>
+                    <div class="logo-icon-combo">
+                        <span class="logo-icon bagel">🥯</span>
+                        <span class="logo-icon chip">💻</span>
+                    </div>
+                    <span class="logo-text">BagelCompute</span>
                 </a>
                 
                 <div class="nav-links">
@@ -65,7 +68,7 @@
         <div class="container">
             <div class="footer-content">
                 <div class="footer-section">
-                    <h3>Python's GPUs</h3>
+                    <h3>BagelCompute</h3>
                     <p>Specialized GPU compute services for developers and creators.</p>
                     <p><small>All services currently under development</small></p>
                 </div>
@@ -94,7 +97,7 @@
             </div>
             
             <div class="copyright">
-                <p>&copy; 2024 Python's GPUs. All prices in USD. Services under development.</p>
+                <p>&copy; 2024 BagelCompute. All prices in USD. Services under development.</p>
                 <p><small>Built with Flask • Hosted on Render</small></p>
             </div>
         </div>
@@ -144,5 +147,62 @@
         setInterval(updateTime, 1000);
         updateTime();
     </script>
+
+    <style>
+        /* BagelCompute Logo Styling */
+        .logo-icon-combo {
+            position: relative;
+            display: inline-block;
+            margin-right: 10px;
+        }
+        
+        .logo-icon {
+            font-size: 1.3rem;
+            line-height: 1;
+            display: inline-block;
+            transition: all 0.3s ease;
+        }
+        
+        .logo-icon.bagel {
+            z-index: 2;
+        }
+        
+        .logo-icon.chip {
+            position: absolute;
+            left: 10px;
+            top: -2px;
+            font-size: 1rem;
+            opacity: 0.9;
+            transform: rotate(15deg);
+            z-index: 1;
+        }
+        
+        .logo:hover .logo-icon.bagel {
+            transform: rotate(15deg) scale(1.1);
+        }
+        
+        .logo:hover .logo-icon.chip {
+            transform: rotate(0deg) scale(1.2);
+            opacity: 1;
+        }
+        
+        .logo-text {
+            font-weight: 700;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        /* Optional: Bagel animation */
+        @keyframes bagel-spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .logo:hover .logo-icon.bagel {
+            animation: bagel-spin 1s ease-in-out;
+        }
+    </style>
 </body>
 </html>
