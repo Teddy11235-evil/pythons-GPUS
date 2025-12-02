@@ -862,3 +862,20 @@ textarea.form-control {
 @keyframes spin {
     to { transform: rotate(360deg); }
 }
+/* New Tag Styles */
+.live-tag {
+    background: var(--success);
+    color: white;
+    animation: pulse-green 2s infinite;
+}
+
+.secure-tag {
+    background: var(--accent-primary);
+    color: white;
+}
+
+@keyframes pulse-green {
+    0% { opacity: 1; }
+    50% { opacity: 0.8; }
+    100% { opacity: 1; }
+}
