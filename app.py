@@ -593,19 +593,32 @@ def debug_orders():
         return jsonify({'error': str(e)}), 500
 
 # ===== ERROR HANDLERS =====
-@app.errorhandler(404)
-def not_found(e):
-    return render_template('404.html'), 404
-
 @app.errorhandler(500)
 def server_error(e):
+    global _last_error_time
+    
+    current_time = time.time()
+    
+    # Rate limit error notifications
+    if current_time - _last_error_time < DISCORD_RATE_LIMIT_SECONDS:
+        print(f"[Discord Rate Limited] Skipping error notification. Last sent: {_last_error_time}")
+        return render_template('500.html', error=str(e)), 500
+    
+    # Update last error time
+    _last_error_time = current_time
+    
+    # Prepare error message
     error_msg = f"""```yaml
 🚨 SERVER ERROR
 • Time: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}
 • Error: {str(e)}
 • Path: {request.path}
+• Rate Limited: ✅ Yes (5s cooldown)
 ```"""
+    
+    # Send to Discord (async)
     send_discord_async(error_msg, "🚨 Error Alert")
+    
     return render_template('500.html', error=str(e)), 500
 
 # ===== STARTUP =====
