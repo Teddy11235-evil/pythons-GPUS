@@ -1,4 +1,3 @@
-# pythons-GPUS
 # About BagelCompute
 
 BagelCompute is a GPU compute service provider offering:
