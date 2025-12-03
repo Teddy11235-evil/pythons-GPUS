@@ -22,5 +22,6 @@ BagelCompute is a GPU compute service provider offering:
 ## Contact
 For service inquiries, use our order forms.
 For business inquiries, please email via our contact form.
+**email: bageltigistudios@gmail.com**
 
 All services are currently in development with limited availability.
