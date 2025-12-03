@@ -1,0 +1,54 @@
+{% extends "base.html" %}
+
+{% block title %}Brand Guidelines - BagelCompute{% endblock %}
+
+{% block content %}
+<div class="container" style="padding: 3rem 0; max-width: 800px;">
+    <h1>BagelCompute Brand Guidelines</h1>
+    
+    <!-- Logo Section -->
+    <section style="margin: 2rem 0; padding: 2rem; background: #f8f9fa; border-radius: 8px;">
+        <h2>Official Logo</h2>
+        <div style="text-align: center; margin: 2rem 0;">
+            <img src="/static/logo.png" alt="BagelCompute Logo" style="max-width: 300px; border: 2px solid #ddd; padding: 20px; background: white;">
+            <p style="margin-top: 1rem;">
+                <strong>Primary Logo (512x512px)</strong><br>
+                <a href="/static/logo.png" download>Download PNG</a>
+            </p>
+        </div>
+        
+        <h3>Logo Usage</h3>
+        <ul>
+            <li>Use on white or light backgrounds</li>
+            <li>Minimum clear space: 20% of logo width</li>
+            <li>Do not stretch, distort, or recolor</li>
+        </ul>
+    </section>
+    
+    <!-- Brand Colors -->
+    <section style="margin: 2rem 0; padding: 2rem; background: #f8f9fa; border-radius: 8px;">
+        <h2>Brand Colors</h2>
+        <div style="display: flex; gap: 1rem; flex-wrap: wrap; margin: 1rem 0;">
+            <div style="background: #667eea; color: white; padding: 1rem; border-radius: 4px; min-width: 150px;">
+                <strong>Primary Purple</strong><br>#667eea<br>RGB(102, 126, 234)
+            </div>
+            <div style="background: #0ea5e9; color: white; padding: 1rem; border-radius: 4px; min-width: 150px;">
+                <strong>Secondary Blue</strong><br>#0ea5e9<br>RGB(14, 165, 233)
+            </div>
+        </div>
+    </section>
+    
+    <!-- Company Info -->
+    <section style="margin: 2rem 0; padding: 2rem; background: #f8f9fa; border-radius: 8px;">
+        <h2>Company Information</h2>
+        <p><strong>BagelCompute</strong> provides professional GPU compute services including:</p>
+        <ul>
+            <li>Blender 3D rendering</li>
+            <li>GPU-accelerated hash cracking</li>
+            <li>Machine learning compute</li>
+        </ul>
+        <p><strong>Founded:</strong> 2024</p>
+        <p><strong>Services:</strong> Cloud GPU computing, rendering, security testing</p>
+    </section>
+</div>
+{% endblock %}
