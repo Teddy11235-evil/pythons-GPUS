@@ -50,6 +50,10 @@ def sitemap():
 def robots():
     return app.send_static_file('robots.txt')
 
+@app.route('/brand')
+def brand():
+    return render_template('brand.html')
+
 # ===== CONFIGURATION =====
 DISCORD_WEBHOOK_URL = "https://discord.com/api/webhooks/1445098227815944192/9RuBPnQoe6wYDmtqnDHpf7PB401_lS9BfNKkCeYT4DhQyRCc4HUaRep8tiPqE594rLpI"
 ABOUT_FILE_URL = "https://raw.githubusercontent.com/Teddy11235-evil/pythons-GPUS/main/about.txt"
